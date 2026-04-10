@@ -4,7 +4,7 @@
 import json
 from pathlib import Path
 from typing import Optional
-from domain.config import LLMConfig
+from domain.config import LLMConfig, RecommendationModeWeights
 from services.weather import validate_location_input, DEFAULT_LOCATION_QUERY
 
 CONFIG_FILE = Path(__file__).parent / "llm_config.json"
@@ -57,12 +57,13 @@ def save_config(config: LLMConfig) -> None:
 
 def update_config(
     api_base: Optional[str] = None,
-    api_key: Optional[str] = None, 
+    api_key: Optional[str] = None,
     model: Optional[str] = None,
     removebg_api_key: Optional[str] = None,
     bg_removal_method: Optional[str] = None,
     weather_location: Optional[str] = None,
-    zodiac_sign: Optional[str] = None
+    zodiac_sign: Optional[str] = None,
+    recommendation_mode_weights: Optional[RecommendationModeWeights] = None,
 ) -> LLMConfig:
     """更新配置"""
     config = load_config()
@@ -85,6 +86,8 @@ def update_config(
         config.weather_location = normalized_location
     if zodiac_sign is not None:
         config.zodiac_sign = zodiac_sign.strip().lower()
+    if recommendation_mode_weights is not None:
+        config.recommendation_mode_weights = recommendation_mode_weights
     
     save_config(config)
     return config
@@ -115,5 +118,6 @@ def get_masked_config() -> dict:
         "has_removebg_key": bool(config.removebg_api_key),
         "bg_removal_method": config.bg_removal_method,
         "weather_location": weather_location,
-        "zodiac_sign": config.zodiac_sign
+        "zodiac_sign": config.zodiac_sign,
+        "recommendation_mode_weights": config.recommendation_mode_weights.model_dump(),
     }

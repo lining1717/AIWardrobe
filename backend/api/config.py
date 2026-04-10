@@ -26,7 +26,8 @@ async def set_config(config_update: LLMConfigUpdate):
             removebg_api_key=config_update.removebg_api_key,
             bg_removal_method=config_update.bg_removal_method,
             weather_location=config_update.weather_location,
-            zodiac_sign=config_update.zodiac_sign
+            zodiac_sign=config_update.zodiac_sign,
+            recommendation_mode_weights=config_update.recommendation_mode_weights,
         )
         return {
             "success": True,
