@@ -146,9 +146,22 @@
     "goalPlaceholder": "e.g. commute / date / sport / interview",
     "goalHint": "Type your occasion or use the microphone.",
     "goalUsed": "Goal used",
+    "modeLabel": "Recommendation mode",
+    "mode": {
+      "balanced": "Balanced",
+      "goal_first": "Goal first",
+      "wardrobe_first": "Wardrobe first"
+    },
+    "modeHint": {
+      "balanced": "Balance weather, goal, and horoscope for overall fit.",
+      "goal_first": "Prioritize items that match your current goal.",
+      "wardrobe_first": "Prioritize making better use of wardrobe items."
+    },
+    "reasonFallback": "Matches current temperature and style strategy",
     "voiceStart": "Start voice input",
     "voiceStop": "Stop voice input",
     "voiceListening": "Listening...",
+    "voiceBusy": "Recommendation is generating. Voice input is temporarily disabled.",
     "voiceUnsupported": "Voice input is not supported in this browser. Please type your goal.",
     "voicePermissionDenied": "Microphone permission is denied. Please enable it and try again.",
     "voiceNoSpeech": "No speech detected. Please try again.",

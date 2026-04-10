@@ -146,9 +146,22 @@
     "goalPlaceholder": "例如：上班通勤 / 约会 / 运动 / 面试",
     "goalHint": "可输入或点击麦克风语音输入目标场景。",
     "goalUsed": "本次目标",
+    "modeLabel": "推荐模式",
+    "mode": {
+      "balanced": "均衡",
+      "goal_first": "目标优先",
+      "wardrobe_first": "衣柜优先"
+    },
+    "modeHint": {
+      "balanced": "综合天气、目标与运势，平衡推荐结果。",
+      "goal_first": "更优先匹配本次目标场景。",
+      "wardrobe_first": "更优先利用现有衣柜单品。"
+    },
+    "reasonFallback": "与当前温度和风格策略匹配",
     "voiceStart": "开始语音输入",
     "voiceStop": "停止语音输入",
     "voiceListening": "正在听你说话...",
+    "voiceBusy": "推荐生成中，暂时不可语音输入。",
     "voiceUnsupported": "当前浏览器不支持语音输入，请手动输入目标。",
     "voicePermissionDenied": "未获得麦克风权限，请开启后重试。",
     "voiceNoSpeech": "没有识别到语音，请再试一次。",

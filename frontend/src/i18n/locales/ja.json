@@ -146,9 +146,22 @@
     "goalPlaceholder": "例：通勤 / デート / スポーツ / 面接",
     "goalHint": "目的は入力またはマイクで音声入力できます。",
     "goalUsed": "今回の目的",
+    "modeLabel": "提案モード",
+    "mode": {
+      "balanced": "バランス",
+      "goal_first": "目的優先",
+      "wardrobe_first": "ワードローブ優先"
+    },
+    "modeHint": {
+      "balanced": "天気・目的・運勢をバランスよく反映します。",
+      "goal_first": "今回の目的シーンとの一致をより重視します。",
+      "wardrobe_first": "手持ちアイテムの活用をより重視します。"
+    },
+    "reasonFallback": "現在の気温とスタイル方針にマッチ",
     "voiceStart": "音声入力を開始",
     "voiceStop": "音声入力を停止",
     "voiceListening": "聞き取り中...",
+    "voiceBusy": "提案生成中のため、音声入力は一時的に利用できません。",
     "voiceUnsupported": "このブラウザでは音声入力に対応していません。手動で入力してください。",
     "voicePermissionDenied": "マイク権限がありません。権限を有効にして再試行してください。",
     "voiceNoSpeech": "音声を検出できませんでした。もう一度お試しください。",

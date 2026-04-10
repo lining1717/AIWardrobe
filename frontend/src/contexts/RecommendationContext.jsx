@@ -20,6 +20,7 @@ const INITIAL_STATE = {
   purchaseSuggestions: [],
   goalRaw: '',
   goalNormalized: '',
+  mode: 'balanced',
   selectedCity: {
     name: DEFAULT_LOCATION,
     id: DEFAULT_LOCATION
@@ -59,17 +60,19 @@ export function RecommendationProvider({ children }) {
     void fetchDefaultCity()
   }, [])
 
-  const fetchRecommendation = useCallback(async (location, preferredName = null, goal = '') => {
+  const fetchRecommendation = useCallback(async (location, preferredName = null, goal = '', mode = 'balanced') => {
+    const safeMode = ['balanced', 'goal_first', 'wardrobe_first'].includes(mode) ? mode : 'balanced'
     if (!location) {
       return null
     }
 
     const requestId = requestIdRef.current + 1
     requestIdRef.current = requestId
-    setState(prev => ({ ...prev, loading: true, error: '' }))
+    setState(prev => ({ ...prev, loading: true, error: '', mode: safeMode }))
 
     try {
       const params = new URLSearchParams({ location })
+      params.set('mode', safeMode)
       const trimmedGoal = (goal || '').trim()
       if (trimmedGoal) {
         params.set('goal', trimmedGoal)
@@ -109,6 +112,7 @@ export function RecommendationProvider({ children }) {
         purchaseSuggestions: data.purchase_suggestions || [],
         goalRaw: data.goal_raw || '',
         goalNormalized: data.goal_normalized || '',
+        mode: data.mode || safeMode,
         selectedCity: preferredName
           ? { name: preferredName, id: location }
           : (data.weather?.location ? { name: data.weather.location, id: location } : prev.selectedCity)
