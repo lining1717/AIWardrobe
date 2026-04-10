@@ -6,7 +6,7 @@ import httpx
 from typing import Any, Literal
 
 from domain.config import ModeBonusWeights
-from domain.clothes import normalize_category_value
+from domain.clothes import resolve_category_value
 from services.horoscope import get_daily_horoscope
 from services.weather import WeatherInfo
 from storage.config_store import load_config
@@ -409,7 +409,11 @@ async def get_ai_recommendation(
     all_by_category: dict[str, list[dict]] = {"top": [], "bottom": [], "shoes": []}
     normalized_categories: list[str] = []
     for item in all_clothes:
-        category = normalize_category_value(str(item.get("category", "")))
+        category = resolve_category_value(
+            str(item.get("category", "")),
+            str(item.get("item", "")),
+            str(item.get("description", "")),
+        )
         normalized_categories.append(category)
         if category not in by_category:
             continue

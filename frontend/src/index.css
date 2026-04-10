@@ -1,3 +1,4 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap");
 @import "tailwindcss";
 
 @custom-variant dark (&:where(.dark, .dark *));
@@ -31,8 +32,15 @@
     --border: #27272A;
   }
 
-  html, body {
+  html,
+  body {
     @apply bg-[var(--bg-primary)] text-[var(--text-primary)] font-sans antialiased m-0 p-0 min-h-screen;
+  }
+
+  h1,
+  h2,
+  h3 {
+    @apply font-serif tracking-tight;
   }
 }
 

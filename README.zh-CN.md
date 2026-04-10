@@ -71,13 +71,11 @@
 - **Node.js** `v20+` &nbsp;|&nbsp; **Python** `v3.10+`
 - [Google Gemini API Key](https://aistudio.google.com/app/apikey) 或 OpenAI 兼容接口 Key
 
-### 1. 克隆与配置
+### 1. 克隆
 
 ```bash
 git clone https://github.com/leoz9/AIWardrobe.git
 cd AIWardrobe
-cp backend/.env.example backend/.env
-# 编辑 backend/.env，填入你的 API Key
 ```
 
 ### 2. 安装依赖
@@ -108,6 +106,8 @@ start.bat
 - **前端页面:** http://localhost:5173
 - **后端 API:** http://localhost:8000
 - **API 文档:** http://localhost:8000/docs
+
+随后在前端 **设置** 页面可视化填写 API Base / API Key / Model 即可。
 
 <details>
 <summary><b>手动启动（分别在两个终端）</b></summary>
@@ -147,10 +147,8 @@ curl "http://localhost:8000/api/recommendation?location=Shanghai,Shanghai,China&
 ### 快速开始（本地构建）
 
 ```bash
-cp backend/.env.example backend/.env
 docker build -t aiwardrobe:local .
 docker run -d --name ai_wardrobe -p 8000:8000 \
-  --env-file backend/.env \
   -v $(pwd)/backend/uploads:/app/backend/uploads \
   -v $(pwd)/backend/data:/app/backend/data \
   aiwardrobe:local
@@ -161,7 +159,6 @@ docker run -d --name ai_wardrobe -p 8000:8000 \
 ```bash
 docker pull ghcr.io/leoz9/aiwardrobe:latest
 docker run -d --name ai_wardrobe -p 8000:8000 \
-  --env-file backend/.env \
   -v $(pwd)/backend/uploads:/app/backend/uploads \
   -v $(pwd)/backend/data:/app/backend/data \
   ghcr.io/leoz9/aiwardrobe:latest
@@ -171,13 +168,13 @@ docker run -d --name ai_wardrobe -p 8000:8000 \
 
 ```bash
 git clone https://github.com/leoz9/AIWardrobe.git && cd AIWardrobe
-cp backend/.env.example backend/.env  # 编辑 .env，填入你的 API Key
 docker compose up --build -d
 ```
 
 访问 http://localhost:8000 &nbsp;|&nbsp; API 文档 http://localhost:8000/docs
 
 数据会持久化保存在 `backend/data` 和 `backend/uploads` 目录中。
+仓库内提供了少量可体验的示例衣物图片：`backend/uploads/demo`。
 
 ## ⭐ Star History
 

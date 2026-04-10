@@ -9,7 +9,7 @@ from services.segment import remove_background
 from services.removebg import remove_background_api
 from services.openai_compatible import analyze_clothes_openai
 from storage.config_store import load_config
-from domain.clothes import ClothesSemantics, ClothesCreate, ClothesItem, normalize_category_value
+from domain.clothes import ClothesSemantics, ClothesCreate, ClothesItem, resolve_category_value
 from storage.db import add_clothes, get_clothes_by_id
 
 router = APIRouter()
@@ -70,7 +70,11 @@ async def upload_image(file: UploadFile = File(...)):
         with open(filepath, "wb") as f:
             f.write(processed_bytes)
         
-        normalized_category = normalize_category_value(semantics.category)
+        normalized_category = resolve_category_value(
+            semantics.category,
+            semantics.item,
+            semantics.description,
+        )
         if normalized_category not in ALLOWED_CATEGORIES:
             normalized_category = "accessory"
 

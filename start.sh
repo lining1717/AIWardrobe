@@ -4,11 +4,7 @@
 
 echo "🚀 启动 AI 智能衣柜..."
 
-# 检查环境变量
-if [ ! -f backend/.env ]; then
-    echo "⚠️  请先配置 backend/.env 文件（参考 backend/.env.example）"
-    echo "   设置您的 GEMINI_API_KEY"
-fi
+echo "ℹ️  首次使用可在前端设置页可视化填写 API 配置（无需先复制 .env）"
 
 # 启动后端
 echo "📦 启动后端服务 (FastAPI)..."

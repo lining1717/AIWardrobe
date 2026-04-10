@@ -75,7 +75,8 @@ async def api_info():
             "weather": "GET /api/weather",
             "weather_suggestion": "GET /api/weather/suggestion",
             "ai_recommendation": "GET /api/recommendation",
-            "daily_horoscope": "GET /api/horoscope/daily"
+            "daily_horoscope": "GET /api/horoscope/daily",
+            "install_rembg": "POST /api/install-rembg"
         }
     }
 

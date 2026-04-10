@@ -71,13 +71,11 @@ Upload clothing photos, remove backgrounds automatically, classify garments with
 - **Node.js** `v20+` &nbsp;|&nbsp; **Python** `v3.10+`
 - [Google Gemini API Key](https://aistudio.google.com/app/apikey) or an OpenAI-compatible API key
 
-### 1. Clone & Configure
+### 1. Clone
 
 ```bash
 git clone https://github.com/leoz9/AIWardrobe.git
 cd AIWardrobe
-cp backend/.env.example backend/.env
-# Edit backend/.env and fill in your API keys
 ```
 
 ### 2. Install Dependencies
@@ -108,6 +106,8 @@ After startup:
 - **Frontend:** http://localhost:5173
 - **Backend API:** http://localhost:8000
 - **API Docs:** http://localhost:8000/docs
+
+Then open **Settings** in the UI to fill API Base/API Key/Model visually.
 
 <details>
 <summary><b>Manual start (separate terminals)</b></summary>
@@ -147,10 +147,8 @@ Response highlights:
 ### Quick Start (Local Build)
 
 ```bash
-cp backend/.env.example backend/.env
 docker build -t aiwardrobe:local .
 docker run -d --name ai_wardrobe -p 8000:8000 \
-  --env-file backend/.env \
   -v $(pwd)/backend/uploads:/app/backend/uploads \
   -v $(pwd)/backend/data:/app/backend/data \
   aiwardrobe:local
@@ -161,7 +159,6 @@ docker run -d --name ai_wardrobe -p 8000:8000 \
 ```bash
 docker pull ghcr.io/leoz9/aiwardrobe:latest
 docker run -d --name ai_wardrobe -p 8000:8000 \
-  --env-file backend/.env \
   -v $(pwd)/backend/uploads:/app/backend/uploads \
   -v $(pwd)/backend/data:/app/backend/data \
   ghcr.io/leoz9/aiwardrobe:latest
@@ -171,13 +168,13 @@ docker run -d --name ai_wardrobe -p 8000:8000 \
 
 ```bash
 git clone https://github.com/leoz9/AIWardrobe.git && cd AIWardrobe
-cp backend/.env.example backend/.env  # Edit .env with your API keys
 docker compose up --build -d
 ```
 
 Access at http://localhost:8000 &nbsp;|&nbsp; API docs at http://localhost:8000/docs
 
 Data is persisted in `backend/data` and `backend/uploads`.
+A few sample clothing images are included under `backend/uploads/demo` for quick体验.
 
 ## ⭐ Star History
 

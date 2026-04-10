@@ -1,6 +1,8 @@
 """
 配置管理 API
 """
+import asyncio
+import sys
 from fastapi import APIRouter, HTTPException
 from domain.config import LLMConfigUpdate, AvailableModel, ModelListResponse
 from storage.config_store import load_config, update_config, get_masked_config
@@ -40,6 +42,37 @@ async def set_config(config_update: LLMConfigUpdate):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@router.post("/install-rembg")
+async def install_rembg_dependencies():
+    """一键安装本地背景移除依赖 rembg + onnxruntime。"""
+    process = await asyncio.create_subprocess_exec(
+        sys.executable,
+        "-m",
+        "pip",
+        "install",
+        "rembg",
+        "onnxruntime",
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
+    )
+    stdout, stderr = await process.communicate()
+    output = ((stdout or b"") + (stderr or b"")).decode("utf-8", errors="ignore")
+    tail_output = output[-4000:] if output else ""
+
+    if process.returncode == 0:
+        return {
+            "success": True,
+            "message": "安装成功，可使用本地 rembg",
+            "output": tail_output,
+        }
+
+    return {
+        "success": False,
+        "message": "安装失败，请稍后重试或使用 remove.bg API",
+        "output": tail_output,
+    }
+
+
 @router.get("/models", response_model=ModelListResponse)
 async def list_models():
     """获取可用模型列表"""
@@ -56,13 +89,13 @@ async def list_models():
 async def test_connection():
     """测试 API 连接"""
     config = load_config()
-    
+
     if not config.api_key:
         return {
             "success": False,
             "message": "请先配置 API Key"
         }
-    
+
     try:
         models = await fetch_available_models()
         if models:

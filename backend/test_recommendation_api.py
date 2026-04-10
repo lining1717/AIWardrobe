@@ -5,6 +5,7 @@ from unittest.mock import AsyncMock, patch
 from fastapi.testclient import TestClient
 
 import main
+from domain.clothes import resolve_category_value
 
 
 def _mock_weather(location: str):
@@ -71,6 +72,10 @@ class RecommendationApiTests(unittest.TestCase):
         self.assertEqual(payload["goal_normalized"], "commute")
         self.assertIn("selection_reasons", payload)
         self.assertTrue(payload["selection_reasons"]["top"])
+
+    def test_category_resolution_for_hoodie_prefers_top(self):
+        category = resolve_category_value("unknown", "连帽拉链卫衣", "休闲风格，适合通勤")
+        self.assertEqual(category, "top")
 
     def test_recommendation_mode_weights_config_roundtrip(self):
         import storage.config_store as config_store

@@ -91,6 +91,7 @@ const Settings = ({ isOpen, onClose, onSave }) => {
     const [locationSuggestions, setLocationSuggestions] = useState([])
     const [searchingLocations, setSearchingLocations] = useState(false)
     const [showLocationDropdown, setShowLocationDropdown] = useState(false)
+    const [installingRembg, setInstallingRembg] = useState(false)
     const locationPickerRef = useRef(null)
 
     useEffect(() => {
@@ -253,6 +254,27 @@ const Settings = ({ isOpen, onClose, onSave }) => {
             })
         } finally {
             setTesting(false)
+        }
+    }
+
+    const handleInstallRembg = async () => {
+        setInstallingRembg(true)
+        try {
+            const response = await fetch(`${API_BASE}/install-rembg`, {
+                method: 'POST'
+            })
+            const data = await response.json().catch(() => ({}))
+            setTestResult({
+                success: Boolean(data.success),
+                message: data.message || (data.success ? t('settings.installRembgSuccess') : t('settings.installRembgFailed'))
+            })
+        } catch {
+            setTestResult({
+                success: false,
+                message: t('settings.installRembgFailed')
+            })
+        } finally {
+            setInstallingRembg(false)
         }
     }
 
@@ -613,6 +635,18 @@ const Settings = ({ isOpen, onClose, onSave }) => {
                                 <div className="flex flex-col">
                                     <span className="font-medium text-zinc-900 dark:text-zinc-100 text-sm">{t('settings.localRembg')}</span>
                                     <span className="text-xs text-zinc-500 mt-0.5">{t('settings.localRembgDesc')}</span>
+                                    <span className="text-[11px] text-zinc-500 mt-1">{t('settings.localRembgOptional')}</span>
+                                    <div className="mt-2 flex items-center gap-2">
+                                        <button
+                                            type="button"
+                                            className="btn-secondary !py-1.5 !px-2 text-xs"
+                                            onClick={handleInstallRembg}
+                                            disabled={installingRembg}
+                                        >
+                                            {installingRembg ? t('settings.installingRembg') : t('settings.installRembg')}
+                                        </button>
+                                        <code className="inline-block rounded bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 text-[11px] text-zinc-700 dark:text-zinc-200">{t('settings.localRembgInstall')}</code>
+                                    </div>
                                 </div>
                             </label>
 

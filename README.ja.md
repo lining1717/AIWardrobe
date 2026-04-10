@@ -71,13 +71,11 @@
 - **Node.js** `v20+` &nbsp;|&nbsp; **Python** `v3.10+`
 - [Google Gemini API Key](https://aistudio.google.com/app/apikey) または OpenAI 互換 API キー
 
-### 1. クローンと設定
+### 1. クローン
 
 ```bash
 git clone https://github.com/leoz9/AIWardrobe.git
 cd AIWardrobe
-cp backend/.env.example backend/.env
-# backend/.env を編集し、API キーを入力してください
 ```
 
 ### 2. 依存関係のインストール
@@ -108,6 +106,8 @@ start.bat
 - **フロントエンド:** http://localhost:5173
 - **バックエンド API:** http://localhost:8000
 - **API ドキュメント:** http://localhost:8000/docs
+
+その後、フロントエンドの **設定** 画面で API Base / API Key / Model をGUIで入力できます。
 
 <details>
 <summary><b>手動起動（ターミナルを2つ使用）</b></summary>
@@ -147,10 +147,8 @@ curl "http://localhost:8000/api/recommendation?location=Shanghai,Shanghai,China&
 ### クイックスタート（ローカルビルド）
 
 ```bash
-cp backend/.env.example backend/.env
 docker build -t aiwardrobe:local .
 docker run -d --name ai_wardrobe -p 8000:8000 \
-  --env-file backend/.env \
   -v $(pwd)/backend/uploads:/app/backend/uploads \
   -v $(pwd)/backend/data:/app/backend/data \
   aiwardrobe:local
@@ -161,7 +159,6 @@ docker run -d --name ai_wardrobe -p 8000:8000 \
 ```bash
 docker pull ghcr.io/leoz9/aiwardrobe:latest
 docker run -d --name ai_wardrobe -p 8000:8000 \
-  --env-file backend/.env \
   -v $(pwd)/backend/uploads:/app/backend/uploads \
   -v $(pwd)/backend/data:/app/backend/data \
   ghcr.io/leoz9/aiwardrobe:latest
@@ -171,13 +168,13 @@ docker run -d --name ai_wardrobe -p 8000:8000 \
 
 ```bash
 git clone https://github.com/leoz9/AIWardrobe.git && cd AIWardrobe
-cp backend/.env.example backend/.env  # .env を編集し、API キーを入力
 docker compose up --build -d
 ```
 
 http://localhost:8000 でアクセス &nbsp;|&nbsp; API ドキュメント http://localhost:8000/docs
 
 データは `backend/data` と `backend/uploads` に永続化されます。
+すぐ試せるサンプル衣類画像を `backend/uploads/demo` に同梱しています。
 
 ## ⭐ Star History
 
