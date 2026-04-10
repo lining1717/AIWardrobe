@@ -31,6 +31,9 @@
 | **天気連動スタイリング** | Open-Meteo の無料グローバル天気 API を利用し、リアルタイム天気に基づいたコーディネートを提案 |
 | **デジタルワードローブ** | 構造化されたビューで衣類を閲覧・検索・管理 |
 | **AI レコメンデーション** | Gemini や OpenAI 互換プロバイダーによるパーソナライズされたコーディネート生成 |
+| **提案モード切替** | `balanced` / `goal_first` / `wardrobe_first` を切り替えて提案方針を調整可能 |
+| **説明可能な提案** | トップス・ボトムス・シューズごとに選定理由を表示 |
+| **音声で目的入力** | 通勤・デート・スポーツなどの目的をマイク入力して提案を最適化 |
 | **レスポンシブ UI** | Tailwind CSS によるモダンなインターフェースで、デスクトップ・タブレット・モバイルに対応 |
 
 ## 📸 スクリーンショット（新 UI）
@@ -120,7 +123,26 @@ cd frontend && npm run dev
 
 </details>
 
-## 🐳 Docker デプロイ
+## 🧠 Recommendation API（モード / 目的 / 説明可能性）
+
+`GET /api/recommendation`
+
+主なクエリパラメータ：
+- `location`：都市名または緯度経度
+- `mode`：`balanced` | `goal_first` | `wardrobe_first`
+- `goal`：任意の目的（例：`commute`、`date`、`sport`、`interview`）
+
+例：
+
+```bash
+curl "http://localhost:8000/api/recommendation?location=Shanghai,Shanghai,China&mode=goal_first&goal=commute"
+```
+
+主なレスポンス項目：
+- `mode`：適用された提案モード
+- `goal_raw` / `goal_normalized`：入力目的と正規化後の目的
+- `selection_reasons`：トップス/ボトムス/シューズの選定理由
+
 
 ### クイックスタート（ローカルビルド）
 

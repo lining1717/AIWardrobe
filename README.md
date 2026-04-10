@@ -31,6 +31,9 @@ Upload clothing photos, remove backgrounds automatically, classify garments with
 | **Weather-Based Styling** | Integrates free global weather data (Open-Meteo) to generate outfit suggestions based on real-time conditions |
 | **Digital Wardrobe** | Browse, search, and manage your clothing in a structured wardrobe view |
 | **AI Recommendations** | Supports Gemini and OpenAI-compatible providers for personalized outfit generation |
+| **Recommendation Modes** | Switch between `balanced`, `goal_first`, and `wardrobe_first` to match different styling priorities |
+| **Explainable Picks** | Shows selection reasons for top/bottom/shoes so each outfit choice is traceable |
+| **Voice Goal Input** | Use microphone input for scenarios like commute/date/sport to guide recommendation intent |
 | **Responsive UI** | Optimized for desktop, tablet, and mobile with a modern Tailwind CSS interface |
 
 ## 📸 Screenshots (New UI)
@@ -120,7 +123,26 @@ cd frontend && npm run dev
 
 </details>
 
-## 🐳 Docker Deployment
+## 🧠 Recommendation API (Modes, Goal, Explainability)
+
+`GET /api/recommendation`
+
+Common query params:
+- `location`: city string or coordinates
+- `mode`: `balanced` | `goal_first` | `wardrobe_first`
+- `goal`: optional scenario, e.g. `commute`, `date`, `sport`, `interview`
+
+Example:
+
+```bash
+curl "http://localhost:8000/api/recommendation?location=Shanghai,Shanghai,China&mode=goal_first&goal=commute"
+```
+
+Response highlights:
+- `mode`: applied recommendation mode
+- `goal_raw` / `goal_normalized`: user goal and normalized intent
+- `selection_reasons`: explainable reasons for top/bottom/shoes selection
+
 
 ### Quick Start (Local Build)
 
