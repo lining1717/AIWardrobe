@@ -9,7 +9,7 @@ from typing import Optional, List
 import httpx
 from pydantic import BaseModel
 
-from storage.db import get_weather_cache, upsert_weather_cache, cleanup_weather_cache
+from storage.db import get_weather_cache, get_latest_weather_cache, upsert_weather_cache, cleanup_weather_cache
 
 
 class CityInfo(BaseModel):
@@ -786,6 +786,15 @@ async def get_weather(location: str = DEFAULT_LOCATION_QUERY) -> Optional[Weathe
     weather_response = await get_qweather_now(resolved_location)
 
     if not weather_response:
+        stale_cached = await get_latest_weather_cache(cache_key)
+        if stale_cached:
+            stale_payload = stale_cached.get("payload") or {}
+            if stale_payload:
+                try:
+                    return WeatherInfo(**stale_payload)
+                except Exception:
+                    pass
+
         print("⚠️  使用模拟天气数据")
         return WeatherInfo(
             temperature=20.0,

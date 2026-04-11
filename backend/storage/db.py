@@ -258,6 +258,25 @@ async def get_weather_cache(location_key: str, bucket_start: str) -> Optional[di
         return _row_to_weather_cache(row)
 
 
+async def get_latest_weather_cache(location_key: str) -> Optional[dict[str, Any]]:
+    """按地点获取最新一条天气缓存。"""
+    async with aiosqlite.connect(DB_PATH) as db:
+        db.row_factory = aiosqlite.Row
+        cursor = await db.execute(
+            """
+            SELECT * FROM weather_cache
+            WHERE location_key = ?
+            ORDER BY bucket_start DESC, updated_at DESC, id DESC
+            LIMIT 1
+            """,
+            (location_key,),
+        )
+        row = await cursor.fetchone()
+        if not row:
+            return None
+        return _row_to_weather_cache(row)
+
+
 async def upsert_weather_cache(
     location_key: str,
     bucket_start: str,

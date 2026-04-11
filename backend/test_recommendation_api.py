@@ -154,6 +154,35 @@ class RecommendationApiTests(unittest.TestCase):
             self.assertEqual(weather.temperature, 18.5)
 
         asyncio.run(run_case())
+    def test_get_weather_falls_back_to_latest_cached_when_provider_fails(self):
+        async def run_case():
+            cache_key = build_weather_cache_key("121.9999,31.9999")
+
+            await db_store.upsert_weather_cache(
+                cache_key,
+                "2000-01-01T00",
+                {
+                    "temperature": 16.0,
+                    "feelsLike": 15.0,
+                    "condition": "阴",
+                    "icon": "104",
+                    "humidity": 70.0,
+                    "windDir": "北风",
+                    "windScale": "3",
+                    "location": "上海, 上海市, 中国",
+                    "obsTime": "2000-01-01T00:00:00+08:00",
+                },
+            )
+
+            with patch("services.weather.resolve_location", new=AsyncMock(return_value=("121.9999,31.9999", "上海, 上海市, 中国"))):
+                with patch("services.weather.get_qweather_now", new=AsyncMock(return_value=None)):
+                    weather = await weather_service.get_weather("上海, 上海市, 中国")
+
+            self.assertIsNotNone(weather)
+            self.assertEqual(weather.condition, "阴")
+            self.assertEqual(weather.temperature, 16.0)
+
+        asyncio.run(run_case())
 
 
 if __name__ == "__main__":
