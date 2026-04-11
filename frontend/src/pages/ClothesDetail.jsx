@@ -142,8 +142,8 @@ export default function ClothesDetail() {
                 </div>
             </header>
 
-            <div className="p-4 space-y-4">
-                <article className="card overflow-hidden">
+            <div className="p-4 sm:px-6 lg:px-8 space-y-4 max-w-6xl mx-auto w-full lg:grid lg:grid-cols-12 lg:gap-4 lg:space-y-0">
+                <article className="card overflow-hidden lg:col-span-5">
                     <div className="aspect-square bg-zinc-100 dark:bg-zinc-800 p-6 flex items-center justify-center">
                         <img
                             src={toImageUrl(item.image_url)}
@@ -157,7 +157,7 @@ export default function ClothesDetail() {
                     </div>
                 </article>
 
-                <section className="card p-4 space-y-4">
+                <section className="card p-4 space-y-4 lg:col-span-7">
                     <div>
                         <h3 className="text-sm font-medium text-zinc-500">{t('clothesDetail.description')}</h3>
                         <p className="mt-1 text-sm text-zinc-800 dark:text-zinc-200">{item.description || t('clothesDetail.empty')}</p>
@@ -184,7 +184,7 @@ export default function ClothesDetail() {
                     </div>
                 </section>
 
-                <section className="card p-4 space-y-4">
+                <section className="card p-4 space-y-4 lg:col-span-12">
                     <div>
                         <h3 className="text-sm font-medium text-zinc-500">{t('clothesDetail.tryOnTitle')}</h3>
                         <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">{t('clothesDetail.tryOnHint')}</p>

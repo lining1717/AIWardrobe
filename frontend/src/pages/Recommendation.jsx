@@ -312,7 +312,7 @@ export default function Recommendation() {
             )}
 
             {!loading && weather && (
-                <div className="flex-1 overflow-y-auto px-4 z-10 space-y-6">
+                <div className="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 z-10 space-y-6 max-w-6xl mx-auto w-full">
                     {error && (
                         <div className="bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-900/40 rounded-2xl p-3 text-xs text-red-700 dark:text-red-200">
                             {error}
@@ -444,7 +444,7 @@ export default function Recommendation() {
                     {suggestedAccessories.length > 0 && (
                         <div className="space-y-3">
                             <h3 className="font-serif font-bold text-zinc-900 dark:text-zinc-100 tracking-tight text-lg pl-1">{t('recommendation.accessories')}</h3>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                                 {suggestedAccessories.map((accessory, index) => (
                                     <div key={`${accessory.name}-${index}`} className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-4">
                                         <div className="flex items-start justify-between gap-3">

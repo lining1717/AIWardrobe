@@ -52,13 +52,13 @@
     @apply bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300;
   }
   .btn-primary {
-    @apply bg-[var(--accent)] text-white hover:opacity-90 transition-all duration-200 rounded-lg font-medium px-4 py-2 flex items-center justify-center gap-2;
+    @apply bg-[var(--accent)] text-white hover:opacity-90 transition-all duration-200 rounded-lg font-medium px-4 min-h-11 py-2 flex items-center justify-center gap-2;
   }
   .btn-secondary {
-    @apply bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors duration-200 rounded-lg font-medium px-4 py-2 flex items-center justify-center gap-2;
+    @apply bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors duration-200 rounded-lg font-medium px-4 min-h-11 py-2 flex items-center justify-center gap-2;
   }
   .btn-icon {
-    @apply p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors;
+    @apply min-w-11 min-h-11 p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors;
   }
   .input-field {
     @apply w-full px-4 py-2 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-all;
