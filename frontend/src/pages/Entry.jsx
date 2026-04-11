@@ -232,7 +232,7 @@ export default function Entry() {
                     </div>
                 </div>
 
-                <div className="mt-4 grid grid-cols-2 gap-2">
+                <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-2">
                     <button className="btn-secondary" onClick={() => navigate('/wardrobe')}>
                         <Shirt size={16} />
                         {t('entry.goWardrobe')}

@@ -202,7 +202,7 @@ export default function Home() {
                             </span>
                         </div>
 
-                        <div className="mt-3 flex items-end justify-between">
+                        <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
                             <div>
                                 <div className="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
                                     {weather ? `${Math.round(weather.temperature)}°` : '--'}
@@ -262,7 +262,7 @@ export default function Home() {
                                     >
                                         {carouselItems.map(item => (
                                             <article key={item.id} className="w-full shrink-0 p-4">
-                                                <div className="flex gap-4 items-center">
+                                                <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                                                     <div className="w-24 h-24 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 p-2 flex items-center justify-center">
                                                         <img
                                                             src={toImageUrl(item.image_url)}

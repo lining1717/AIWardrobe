@@ -230,7 +230,7 @@ export default function Recommendation() {
                         <label className="block text-xs font-semibold text-zinc-500 uppercase tracking-wide">
                             {t('recommendation.modeLabel')}
                         </label>
-                        <div className="grid grid-cols-3 gap-2">
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                             {['balanced', 'goal_first', 'wardrobe_first'].map((option) => (
                                 <button
                                     key={option}
@@ -253,7 +253,7 @@ export default function Recommendation() {
                         <label className="block text-xs font-semibold text-zinc-500 uppercase tracking-wide">
                             {t('recommendation.goalLabel')}
                         </label>
-                        <div className="flex items-center gap-2">
+                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                             <input
                                 className="input flex-1"
                                 value={goalInput}
@@ -262,7 +262,7 @@ export default function Recommendation() {
                             />
                             <button
                                 type="button"
-                                className="btn-secondary px-3"
+                                className="btn-secondary px-3 w-full sm:w-auto justify-center"
                                 onClick={toggleListening}
                                 disabled={!speechSupported || loading}
                                 title={speechSupported
