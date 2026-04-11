@@ -29,6 +29,11 @@ class LLMConfig(BaseModel):
     # remove.bg 配置
     removebg_api_key: str = ""
     bg_removal_method: Literal["local", "removebg"] = "local"  # 本地 rembg 或 remove.bg API
+    # Try-on 配置
+    tryon_provider: Literal["disabled", "custom"] = "disabled"
+    tryon_api_url: str = ""
+    tryon_api_key: str = ""
+    tryon_model: str = ""
     # 默认天气城市（用于首页与推荐页）
     weather_location: str = "上海, 上海市, 中国"
     # 用户星座配置（用于首页运势）
@@ -44,6 +49,10 @@ class LLMConfigUpdate(BaseModel):
     model: Optional[str] = None
     removebg_api_key: Optional[str] = None
     bg_removal_method: Optional[Literal["local", "removebg"]] = None
+    tryon_provider: Optional[Literal["disabled", "custom"]] = None
+    tryon_api_url: Optional[str] = None
+    tryon_api_key: Optional[str] = None
+    tryon_model: Optional[str] = None
     weather_location: Optional[str] = None
     zodiac_sign: Optional[str] = None
     recommendation_mode_weights: Optional[RecommendationModeWeights] = None

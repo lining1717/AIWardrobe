@@ -61,13 +61,17 @@ def update_config(
     model: Optional[str] = None,
     removebg_api_key: Optional[str] = None,
     bg_removal_method: Optional[str] = None,
+    tryon_provider: Optional[str] = None,
+    tryon_api_url: Optional[str] = None,
+    tryon_api_key: Optional[str] = None,
+    tryon_model: Optional[str] = None,
     weather_location: Optional[str] = None,
     zodiac_sign: Optional[str] = None,
     recommendation_mode_weights: Optional[RecommendationModeWeights] = None,
 ) -> LLMConfig:
     """更新配置"""
     config = load_config()
-    
+
     if api_base is not None:
         config.api_base = api_base.strip()
     if api_key is not None:
@@ -78,6 +82,14 @@ def update_config(
         config.removebg_api_key = removebg_api_key.strip()
     if bg_removal_method is not None:
         config.bg_removal_method = bg_removal_method
+    if tryon_provider is not None:
+        config.tryon_provider = tryon_provider
+    if tryon_api_url is not None:
+        config.tryon_api_url = tryon_api_url.strip()
+    if tryon_api_key is not None:
+        config.tryon_api_key = tryon_api_key.strip()
+    if tryon_model is not None:
+        config.tryon_model = tryon_model.strip()
     if weather_location is not None:
         normalized_location = weather_location.strip() or DEFAULT_LOCATION_QUERY
         validation_error = validate_location_input(normalized_location)
@@ -88,7 +100,7 @@ def update_config(
         config.zodiac_sign = zodiac_sign.strip().lower()
     if recommendation_mode_weights is not None:
         config.recommendation_mode_weights = recommendation_mode_weights
-    
+
     save_config(config)
     return config
 
@@ -117,6 +129,11 @@ def get_masked_config() -> dict:
         "removebg_api_key_masked": _mask_key(config.removebg_api_key),
         "has_removebg_key": bool(config.removebg_api_key),
         "bg_removal_method": config.bg_removal_method,
+        "tryon_provider": config.tryon_provider,
+        "tryon_api_url": config.tryon_api_url,
+        "tryon_api_key_masked": _mask_key(config.tryon_api_key),
+        "has_tryon_api_key": bool(config.tryon_api_key),
+        "tryon_model": config.tryon_model,
         "weather_location": weather_location,
         "zodiac_sign": config.zodiac_sign,
         "recommendation_mode_weights": config.recommendation_mode_weights.model_dump(),
