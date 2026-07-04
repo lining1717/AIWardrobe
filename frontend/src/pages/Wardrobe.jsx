@@ -121,7 +121,7 @@ export default function Wardrobe() {
                 <FilterBar onSearch={handleSearch} onFilterChange={handleFilterChange} />
             </header>
 
-            <div className="p-4 space-y-8 mt-2">
+            <div className="p-4 sm:px-6 lg:px-8 space-y-8 mt-2 max-w-7xl mx-auto w-full">
                 {sections.map(section => (
                     <section key={section.title} className="space-y-4">
                         <div className="flex items-center gap-2 px-1">
@@ -137,7 +137,7 @@ export default function Wardrobe() {
                                 <p className="text-sm">{t('wardrobe.noMatch')}</p>
                             </div>
                         ) : (
-                            <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3">
+                            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4">
                                 {section.items.map(item => (
                                     <div
                                         key={item.id}

@@ -28,8 +28,9 @@ export default function Home() {
     const [horoscope, setHoroscope] = useState(null)
     const [horoscopeInferenceLoading, setHoroscopeInferenceLoading] = useState(false)
     const [defaultLocation, setDefaultLocation] = useState(FALLBACK_LOCATION)
-    const [loading, setLoading] = useState(true)
-    const [refreshing, setRefreshing] = useState(false)
+    const [weatherLoading, setWeatherLoading] = useState(true)
+    const [wardrobeLoading, setWardrobeLoading] = useState(true)
+    const [horoscopeLoading, setHoroscopeLoading] = useState(true)
     const [showSettings, setShowSettings] = useState(false)
     const [activeIndex, setActiveIndex] = useState(0)
 
@@ -88,56 +89,70 @@ export default function Home() {
         }
     }
 
-    const fetchDashboard = async (withLoading = true, location = defaultLocation) => {
-        if (withLoading) {
-            setLoading(true)
-        } else {
-            setRefreshing(true)
-        }
+    const fetchDashboard = async (location = defaultLocation) => {
+        setWeatherLoading(true)
+        setWardrobeLoading(true)
+        setHoroscopeLoading(true)
 
-        try {
-            const [weatherRes, wardrobeRes, horoscopeData] = await Promise.all([
-                fetch(`${API_BASE}/weather?location=${encodeURIComponent(location)}`),
-                fetch(`${API_BASE}/wardrobe`),
-                fetchHoroscope(location, false)
-            ])
-
-            if (weatherRes.ok) {
-                setWeather(await weatherRes.json())
-            }
-
-            if (wardrobeRes.ok) {
-                const data = await wardrobeRes.json()
-                setWardrobe({
-                    tops: data.tops || [],
-                    bottoms: data.bottoms || [],
-                    shoes: data.shoes || [],
-                    accessories: data.accessories || []
-                })
-            }
-
-            if (horoscopeData) {
-                setHoroscope(horoscopeData)
-                const shouldInfer = horoscopeData.llm_status === 'pending'
-                if (horoscopeData.is_configured && shouldInfer) {
-                    void runHoroscopeInference(location)
-                } else {
-                    setHoroscopeInferenceLoading(false)
+        const weatherTask = (async () => {
+            try {
+                const weatherRes = await fetch(`${API_BASE}/weather?location=${encodeURIComponent(location)}`)
+                if (weatherRes.ok) {
+                    setWeather(await weatherRes.json())
                 }
+            } catch (error) {
+                console.error('Failed to fetch weather:', error)
+            } finally {
+                setWeatherLoading(false)
             }
-        } catch (error) {
-            console.error('Failed to fetch home dashboard:', error)
-        } finally {
-            setLoading(false)
-            setRefreshing(false)
-        }
+        })()
+
+        const wardrobeTask = (async () => {
+            try {
+                const wardrobeRes = await fetch(`${API_BASE}/wardrobe`)
+                if (wardrobeRes.ok) {
+                    const data = await wardrobeRes.json()
+                    setWardrobe({
+                        tops: data.tops || [],
+                        bottoms: data.bottoms || [],
+                        shoes: data.shoes || [],
+                        accessories: data.accessories || []
+                    })
+                }
+            } catch (error) {
+                console.error('Failed to fetch wardrobe:', error)
+            } finally {
+                setWardrobeLoading(false)
+            }
+        })()
+
+        const horoscopeTask = (async () => {
+            try {
+                const horoscopeData = await fetchHoroscope(location, false)
+                if (horoscopeData) {
+                    setHoroscope(horoscopeData)
+                    const shouldInfer = horoscopeData.llm_status === 'pending'
+                    if (horoscopeData.is_configured && shouldInfer) {
+                        void runHoroscopeInference(location)
+                    } else {
+                        setHoroscopeInferenceLoading(false)
+                    }
+                }
+            } catch (error) {
+                console.error('Failed to fetch horoscope:', error)
+            } finally {
+                setHoroscopeLoading(false)
+            }
+        })()
+
+        await Promise.allSettled([weatherTask, wardrobeTask, horoscopeTask])
     }
 
     useEffect(() => {
         const initializeDashboard = async () => {
             const location = await fetchConfiguredLocation()
             setDefaultLocation(location)
-            await fetchDashboard(true, location)
+            await fetchDashboard(location)
         }
 
         void initializeDashboard()
@@ -146,8 +161,10 @@ export default function Home() {
     const handleSettingsSaved = async () => {
         const location = await fetchConfiguredLocation()
         setDefaultLocation(location)
-        await fetchDashboard(false, location)
+        await fetchDashboard(location)
     }
+
+    const refreshing = weatherLoading || wardrobeLoading || horoscopeLoading || horoscopeInferenceLoading
 
     const getCategoryLabel = (category) => {
         if (category === 'top') return t('home.categoryTop')
@@ -160,7 +177,7 @@ export default function Home() {
 
     return (
         <div className="min-h-screen bg-[var(--bg-primary)] pb-28 relative overflow-hidden">
-            <header className="px-4 pt-6 pb-4 flex items-start justify-between relative z-10">
+            <header className="px-4 sm:px-6 lg:px-8 pt-6 pb-4 flex items-start justify-between relative z-10 max-w-6xl mx-auto w-full">
                 <div>
                     <p className="text-[11px] tracking-[0.08em] text-zinc-500">{t('home.today')}</p>
                     <p className="text-sm text-zinc-500 mt-1">{formatDate(i18n.language)}</p>
@@ -168,14 +185,14 @@ export default function Home() {
 
                 <div className="flex items-center gap-2">
                     <button
-                        className="w-10 h-10 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white/90 dark:bg-zinc-900/90 flex items-center justify-center text-zinc-600 dark:text-zinc-300 hover:text-accent transition-colors cursor-pointer"
-                        onClick={() => fetchDashboard(false)}
+                        className="w-11 h-11 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white/90 dark:bg-zinc-900/90 flex items-center justify-center text-zinc-600 dark:text-zinc-300 hover:text-accent transition-colors cursor-pointer"
+                        onClick={() => fetchDashboard()}
                         title={t('home.refresh')}
                     >
                         <RefreshCw size={18} className={refreshing ? 'animate-spin' : ''} />
                     </button>
                     <button
-                        className="w-10 h-10 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white/90 dark:bg-zinc-900/90 flex items-center justify-center text-zinc-600 dark:text-zinc-300 hover:text-accent transition-colors cursor-pointer"
+                        className="w-11 h-11 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white/90 dark:bg-zinc-900/90 flex items-center justify-center text-zinc-600 dark:text-zinc-300 hover:text-accent transition-colors cursor-pointer"
                         onClick={() => setShowSettings(true)}
                         title={t('settings.title')}
                     >
@@ -184,14 +201,9 @@ export default function Home() {
                 </div>
             </header>
 
-            {loading ? (
-                <div className="px-4 py-12 flex flex-col items-center justify-center relative z-10">
-                    <div className="w-10 h-10 border-4 border-zinc-200 dark:border-zinc-700 border-t-accent rounded-full animate-spin"></div>
-                    <p className="text-sm text-zinc-500 mt-4">{t('home.loading')}</p>
-                </div>
-            ) : (
-                <main className="px-4 space-y-4 relative z-10">
-                    <section className="card p-4 sm:p-5">
+            <main className="px-4 sm:px-6 lg:px-8 relative z-10 max-w-6xl mx-auto w-full pb-2">
+                <div className="grid gap-4 lg:grid-cols-12">
+                    <section className="card p-4 sm:p-5 lg:col-span-5">
                         <div className="flex items-center justify-between">
                             <h2 className={sectionTitleClass}>
                                 <CloudSun size={18} className="text-accent" />
@@ -202,33 +214,40 @@ export default function Home() {
                             </span>
                         </div>
 
-                        <div className="mt-3 flex items-end justify-between">
-                            <div>
-                                <div className="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
-                                    {weather ? `${Math.round(weather.temperature)}°` : '--'}
+                        {weatherLoading ? (
+                            <div className="mt-4 flex items-center gap-2 text-sm text-zinc-500">
+                                <div className="w-4 h-4 border-2 border-zinc-300 dark:border-zinc-700 border-t-accent rounded-full animate-spin"></div>
+                                {t('home.loading')}
+                            </div>
+                        ) : (
+                            <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+                                <div>
+                                    <div className="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
+                                        {weather ? `${Math.round(weather.temperature)}°` : '--'}
+                                    </div>
+                                    <div className="text-sm text-zinc-500 mt-1 break-words">
+                                        {weather?.location || t('home.unknownLocation')} · {weather?.condition || t('home.unknownWeather')}
+                                    </div>
                                 </div>
-                                <div className="text-sm text-zinc-500 mt-1">
-                                    {weather?.location || t('home.unknownLocation')} · {weather?.condition || t('home.unknownWeather')}
+                                <div className="text-xs text-zinc-500 space-y-1">
+                                    <div className="flex items-center gap-1.5">
+                                        <Thermometer size={13} />
+                                        {t('home.weatherFeelsLike')}: {weather ? `${Math.round(weather.feelsLike)}°` : '--'}
+                                    </div>
+                                    <div className="flex items-center gap-1.5">
+                                        <Droplets size={13} />
+                                        {t('home.weatherHumidity')}: {weather ? `${Math.round(weather.humidity)}%` : '--'}
+                                    </div>
+                                    <div className="flex items-center gap-1.5">
+                                        <Wind size={13} />
+                                        {t('home.weatherWind')}: {weather?.windScale || '--'}
+                                    </div>
                                 </div>
                             </div>
-                            <div className="text-xs text-zinc-500 space-y-1">
-                                <div className="flex items-center gap-1.5">
-                                    <Thermometer size={13} />
-                                    {t('home.weatherFeelsLike')}: {weather ? `${Math.round(weather.feelsLike)}°` : '--'}
-                                </div>
-                                <div className="flex items-center gap-1.5">
-                                    <Droplets size={13} />
-                                    {t('home.weatherHumidity')}: {weather ? `${Math.round(weather.humidity)}%` : '--'}
-                                </div>
-                                <div className="flex items-center gap-1.5">
-                                    <Wind size={13} />
-                                    {t('home.weatherWind')}: {weather?.windScale || '--'}
-                                </div>
-                            </div>
-                        </div>
+                        )}
                     </section>
 
-                    <section className="card p-4 sm:p-5">
+                    <section className="card p-4 sm:p-5 lg:col-span-7">
                         <div className="flex items-center justify-between mb-3">
                             <h2 className={sectionTitleClass}>
                                 <Shirt size={18} className="text-accent" />
@@ -242,7 +261,12 @@ export default function Home() {
                             </button>
                         </div>
 
-                        {carouselItems.length === 0 ? (
+                        {wardrobeLoading ? (
+                            <div className="rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50/70 dark:bg-zinc-800/40 p-8 text-center">
+                                <div className="w-6 h-6 mx-auto border-2 border-zinc-300 dark:border-zinc-700 border-t-accent rounded-full animate-spin"></div>
+                                <p className="text-sm text-zinc-500 mt-3">{t('home.loading')}</p>
+                            </div>
+                        ) : carouselItems.length === 0 ? (
                             <div className="rounded-xl border border-dashed border-zinc-200 dark:border-zinc-700 bg-zinc-50/70 dark:bg-zinc-800/40 p-8 text-center">
                                 <p className="text-sm text-zinc-500">{t('home.emptyWardrobe')}</p>
                                 <button
@@ -262,7 +286,7 @@ export default function Home() {
                                     >
                                         {carouselItems.map(item => (
                                             <article key={item.id} className="w-full shrink-0 p-4">
-                                                <div className="flex gap-4 items-center">
+                                                <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                                                     <div className="w-24 h-24 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 p-2 flex items-center justify-center">
                                                         <img
                                                             src={toImageUrl(item.image_url)}
@@ -288,14 +312,14 @@ export default function Home() {
                                 {carouselItems.length > 1 && (
                                     <>
                                         <button
-                                            className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/90 dark:bg-zinc-900/90 border border-zinc-200 dark:border-zinc-700 flex items-center justify-center text-zinc-600 dark:text-zinc-300 hover:text-accent transition-colors cursor-pointer"
+                                            className="absolute left-2 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white/90 dark:bg-zinc-900/90 border border-zinc-200 dark:border-zinc-700 flex items-center justify-center text-zinc-600 dark:text-zinc-300 hover:text-accent transition-colors cursor-pointer"
                                             onClick={() => setActiveIndex(prev => (prev > 0 ? prev - 1 : carouselItems.length - 1))}
                                             aria-label={t('home.previous')}
                                         >
                                             <ChevronLeft size={16} />
                                         </button>
                                         <button
-                                            className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/90 dark:bg-zinc-900/90 border border-zinc-200 dark:border-zinc-700 flex items-center justify-center text-zinc-600 dark:text-zinc-300 hover:text-accent transition-colors cursor-pointer"
+                                            className="absolute right-2 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white/90 dark:bg-zinc-900/90 border border-zinc-200 dark:border-zinc-700 flex items-center justify-center text-zinc-600 dark:text-zinc-300 hover:text-accent transition-colors cursor-pointer"
                                             onClick={() => setActiveIndex(prev => (prev < carouselItems.length - 1 ? prev + 1 : 0))}
                                             aria-label={t('home.next')}
                                         >
@@ -320,7 +344,7 @@ export default function Home() {
                         )}
                     </section>
 
-                    <section className="card p-4 sm:p-5">
+                    <section className="card p-4 sm:p-5 lg:col-span-12">
                         <div className="flex items-center justify-between mb-3">
                             <h2 className={sectionTitleClass}>
                                 <Sparkles size={18} className="text-accent" />
@@ -331,52 +355,61 @@ export default function Home() {
                             </span>
                         </div>
 
-                        <p className="text-sm text-zinc-700 dark:text-zinc-200 leading-relaxed">{horoscope?.summary || t('home.horoscopeFallback')}</p>
-
-                        <div className="grid grid-cols-3 gap-2 mt-4">
-                            <div className="rounded-lg bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700 p-2.5">
-                                <div className="text-[10px] uppercase tracking-wide text-zinc-500">{t('home.mood')}</div>
-                                <div className="text-xs font-semibold text-zinc-900 dark:text-zinc-100 mt-1 truncate">{horoscope?.mood || '--'}</div>
+                        {horoscopeLoading ? (
+                            <div className="flex items-center gap-2 text-sm text-zinc-500">
+                                <div className="w-4 h-4 border-2 border-zinc-300 dark:border-zinc-700 border-t-accent rounded-full animate-spin"></div>
+                                {t('home.loading')}
                             </div>
-                            <div className="rounded-lg bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700 p-2.5">
-                                <div className="text-[10px] uppercase tracking-wide text-zinc-500">{t('home.luckyColor')}</div>
-                                <div className="text-xs font-semibold text-zinc-900 dark:text-zinc-100 mt-1 truncate">{horoscope?.lucky_color || '--'}</div>
-                            </div>
-                            <div className="rounded-lg bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700 p-2.5">
-                                <div className="text-[10px] uppercase tracking-wide text-zinc-500">{t('home.luckyNumber')}</div>
-                                <div className="text-xs font-semibold text-zinc-900 dark:text-zinc-100 mt-1 truncate">{horoscope?.lucky_number || '--'}</div>
-                            </div>
-                        </div>
+                        ) : (
+                            <>
+                                <p className="text-sm text-zinc-700 dark:text-zinc-200 leading-relaxed">{horoscope?.summary || t('home.horoscopeFallback')}</p>
 
-                        <div className="mt-3 text-xs text-zinc-500 leading-relaxed">
-                            {horoscope?.suggestion || t('home.horoscopeFallback')}
-                        </div>
-
-                        <div className="mt-4 rounded-lg bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700 p-3">
-                            <div className="text-[10px] uppercase tracking-wide text-zinc-500">{t('home.llmReasoningTitle')}</div>
-                            {horoscopeInferenceLoading ? (
-                                <div className="mt-2 flex items-center gap-2 text-xs text-zinc-500">
-                                    <div className="w-4 h-4 border-2 border-zinc-300 dark:border-zinc-700 border-t-accent rounded-full animate-spin"></div>
-                                    {t('home.llmReasoningLoading')}
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-4">
+                                    <div className="rounded-lg bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700 p-2.5">
+                                        <div className="text-[10px] uppercase tracking-wide text-zinc-500">{t('home.mood')}</div>
+                                        <div className="text-xs font-semibold text-zinc-900 dark:text-zinc-100 mt-1 truncate">{horoscope?.mood || '--'}</div>
+                                    </div>
+                                    <div className="rounded-lg bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700 p-2.5">
+                                        <div className="text-[10px] uppercase tracking-wide text-zinc-500">{t('home.luckyColor')}</div>
+                                        <div className="text-xs font-semibold text-zinc-900 dark:text-zinc-100 mt-1 truncate">{horoscope?.lucky_color || '--'}</div>
+                                    </div>
+                                    <div className="rounded-lg bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700 p-2.5">
+                                        <div className="text-[10px] uppercase tracking-wide text-zinc-500">{t('home.luckyNumber')}</div>
+                                        <div className="text-xs font-semibold text-zinc-900 dark:text-zinc-100 mt-1 truncate">{horoscope?.lucky_number || '--'}</div>
+                                    </div>
                                 </div>
-                            ) : (
-                                <p className="mt-2 text-[11px] text-zinc-500 dark:text-zinc-400 leading-relaxed">
-                                    {horoscope?.llm_reasoning || t('home.llmReasoningFallback')}
-                                </p>
-                            )}
-                        </div>
 
-                        {horoscope && !horoscope.is_configured && (
-                            <button
-                                className="mt-4 w-full py-2.5 rounded-lg bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 text-sm font-medium hover:opacity-90 cursor-pointer transition-opacity"
-                                onClick={() => setShowSettings(true)}
-                            >
-                                {t('home.setZodiac')}
-                            </button>
+                                <div className="mt-3 text-xs text-zinc-500 leading-relaxed">
+                                    {horoscope?.suggestion || t('home.horoscopeFallback')}
+                                </div>
+
+                                <div className="mt-4 rounded-lg bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700 p-3">
+                                    <div className="text-[10px] uppercase tracking-wide text-zinc-500">{t('home.llmReasoningTitle')}</div>
+                                    {horoscopeInferenceLoading ? (
+                                        <div className="mt-2 flex items-center gap-2 text-xs text-zinc-500">
+                                            <div className="w-4 h-4 border-2 border-zinc-300 dark:border-zinc-700 border-t-accent rounded-full animate-spin"></div>
+                                            {t('home.llmReasoningLoading')}
+                                        </div>
+                                    ) : (
+                                        <p className="mt-2 text-[11px] text-zinc-500 dark:text-zinc-400 leading-relaxed">
+                                            {horoscope?.llm_reasoning || t('home.llmReasoningFallback')}
+                                        </p>
+                                    )}
+                                </div>
+
+                                {horoscope && !horoscope.is_configured && (
+                                    <button
+                                        className="mt-4 w-full py-2.5 rounded-lg bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 text-sm font-medium hover:opacity-90 cursor-pointer transition-opacity"
+                                        onClick={() => setShowSettings(true)}
+                                    >
+                                        {t('home.setZodiac')}
+                                    </button>
+                                )}
+                            </>
                         )}
                     </section>
-                </main>
-            )}
+                </div>
+            </main>
 
             <Settings
                 isOpen={showSettings}

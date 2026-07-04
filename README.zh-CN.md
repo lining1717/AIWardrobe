@@ -31,6 +31,9 @@
 | **天气穿搭** | 集成 Open-Meteo 免费全球天气接口，根据实时天气生成更合适的穿搭建议 |
 | **虚拟衣柜** | 以结构化方式浏览、搜索和管理所有衣物 |
 | **AI 推荐** | 支持 Gemini 和 OpenAI 风格接口，用于生成个性化穿搭方案 |
+| **推荐模式切换** | 支持 `balanced`、`goal_first`、`wardrobe_first` 三种推荐策略 |
+| **可解释推荐** | 为上装/下装/鞋履展示选择理由，便于理解推荐依据 |
+| **语音目标输入** | 可通过麦克风输入“通勤/约会/运动”等场景目标引导推荐 |
 | **响应式界面** | 基于 Tailwind CSS，适配桌面、平板和手机 |
 
 ## 📸 界面截图（新版 UI）
@@ -68,13 +71,11 @@
 - **Node.js** `v20+` &nbsp;|&nbsp; **Python** `v3.10+`
 - [Google Gemini API Key](https://aistudio.google.com/app/apikey) 或 OpenAI 兼容接口 Key
 
-### 1. 克隆与配置
+### 1. 克隆
 
 ```bash
 git clone https://github.com/leoz9/AIWardrobe.git
 cd AIWardrobe
-cp backend/.env.example backend/.env
-# 编辑 backend/.env，填入你的 API Key
 ```
 
 ### 2. 安装依赖
@@ -106,6 +107,8 @@ start.bat
 - **后端 API:** http://localhost:8000
 - **API 文档:** http://localhost:8000/docs
 
+随后在前端 **设置** 页面可视化填写 API Base / API Key / Model 即可。
+
 <details>
 <summary><b>手动启动（分别在两个终端）</b></summary>
 
@@ -120,15 +123,32 @@ cd frontend && npm run dev
 
 </details>
 
-## 🐳 Docker 部署
+## 🧠 推荐 API（模式 / 目标 / 可解释性）
+
+`GET /api/recommendation`
+
+常用查询参数：
+- `location`：城市名或经纬度
+- `mode`：`balanced` | `goal_first` | `wardrobe_first`
+- `goal`：可选场景目标，例如 `commute`、`date`、`sport`、`interview`
+
+示例：
+
+```bash
+curl "http://localhost:8000/api/recommendation?location=Shanghai,Shanghai,China&mode=goal_first&goal=commute"
+```
+
+响应重点字段：
+- `mode`：本次生效的推荐模式
+- `goal_raw` / `goal_normalized`：原始目标与归一化目标
+- `selection_reasons`：上装/下装/鞋履的可解释选择理由
+
 
 ### 快速开始（本地构建）
 
 ```bash
-cp backend/.env.example backend/.env
 docker build -t aiwardrobe:local .
 docker run -d --name ai_wardrobe -p 8000:8000 \
-  --env-file backend/.env \
   -v $(pwd)/backend/uploads:/app/backend/uploads \
   -v $(pwd)/backend/data:/app/backend/data \
   aiwardrobe:local
@@ -139,7 +159,6 @@ docker run -d --name ai_wardrobe -p 8000:8000 \
 ```bash
 docker pull ghcr.io/leoz9/aiwardrobe:latest
 docker run -d --name ai_wardrobe -p 8000:8000 \
-  --env-file backend/.env \
   -v $(pwd)/backend/uploads:/app/backend/uploads \
   -v $(pwd)/backend/data:/app/backend/data \
   ghcr.io/leoz9/aiwardrobe:latest
@@ -149,13 +168,13 @@ docker run -d --name ai_wardrobe -p 8000:8000 \
 
 ```bash
 git clone https://github.com/leoz9/AIWardrobe.git && cd AIWardrobe
-cp backend/.env.example backend/.env  # 编辑 .env，填入你的 API Key
 docker compose up --build -d
 ```
 
 访问 http://localhost:8000 &nbsp;|&nbsp; API 文档 http://localhost:8000/docs
 
 数据会持久化保存在 `backend/data` 和 `backend/uploads` 目录中。
+仓库内提供了少量可体验的示例衣物图片：`backend/uploads/demo`。
 
 ## ⭐ Star History
 

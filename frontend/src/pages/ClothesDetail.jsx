@@ -12,6 +12,11 @@ export default function ClothesDetail() {
     const [item, setItem] = useState(null)
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState('')
+    const [personImageFile, setPersonImageFile] = useState(null)
+    const [personImagePreview, setPersonImagePreview] = useState('')
+    const [tryOnResultUrl, setTryOnResultUrl] = useState('')
+    const [tryOnLoading, setTryOnLoading] = useState(false)
+    const [tryOnError, setTryOnError] = useState('')
 
     useEffect(() => {
         fetchClothesDetail()
@@ -48,6 +53,52 @@ export default function ClothesDetail() {
                 ))}
             </div>
         )
+    }
+
+    const handlePersonImageChange = (event) => {
+        const file = event.target.files?.[0]
+        if (!file) return
+        setPersonImageFile(file)
+        setTryOnResultUrl('')
+        setTryOnError('')
+
+        const nextPreview = URL.createObjectURL(file)
+        if (personImagePreview) {
+            URL.revokeObjectURL(personImagePreview)
+        }
+        setPersonImagePreview(nextPreview)
+    }
+
+    const handleTryOn = async () => {
+        if (!personImageFile || !item) {
+            setTryOnError(t('clothesDetail.tryOnNeedPersonImage'))
+            return
+        }
+
+        setTryOnLoading(true)
+        setTryOnError('')
+        try {
+            const formData = new FormData()
+            formData.append('person_image', personImageFile)
+            formData.append('garment_id', String(item.id))
+            formData.append('category', item.category || 'top')
+
+            const response = await fetch(`${API_BASE}/tryon`, {
+                method: 'POST',
+                body: formData
+            })
+
+            const data = await response.json().catch(() => ({}))
+            if (!response.ok || !data.result_image_url) {
+                throw new Error(data.detail || t('clothesDetail.tryOnFailed'))
+            }
+
+            setTryOnResultUrl(toImageUrl(data.result_image_url))
+        } catch (err) {
+            setTryOnError(err.message || t('clothesDetail.tryOnFailed'))
+        } finally {
+            setTryOnLoading(false)
+        }
     }
 
     if (loading) {
@@ -91,8 +142,8 @@ export default function ClothesDetail() {
                 </div>
             </header>
 
-            <div className="p-4 space-y-4">
-                <article className="card overflow-hidden">
+            <div className="p-4 sm:px-6 lg:px-8 space-y-4 max-w-6xl mx-auto w-full lg:grid lg:grid-cols-12 lg:gap-4 lg:space-y-0">
+                <article className="card overflow-hidden lg:col-span-5">
                     <div className="aspect-square bg-zinc-100 dark:bg-zinc-800 p-6 flex items-center justify-center">
                         <img
                             src={toImageUrl(item.image_url)}
@@ -106,7 +157,7 @@ export default function ClothesDetail() {
                     </div>
                 </article>
 
-                <section className="card p-4 space-y-4">
+                <section className="card p-4 space-y-4 lg:col-span-7">
                     <div>
                         <h3 className="text-sm font-medium text-zinc-500">{t('clothesDetail.description')}</h3>
                         <p className="mt-1 text-sm text-zinc-800 dark:text-zinc-200">{item.description || t('clothesDetail.empty')}</p>
@@ -131,6 +182,40 @@ export default function ClothesDetail() {
                         <h3 className="text-sm font-medium text-zinc-500">{t('clothesDetail.usage')}</h3>
                         <div className="mt-1">{renderTags(item.usage_semantics)}</div>
                     </div>
+                </section>
+
+                <section className="card p-4 space-y-4 lg:col-span-12">
+                    <div>
+                        <h3 className="text-sm font-medium text-zinc-500">{t('clothesDetail.tryOnTitle')}</h3>
+                        <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">{t('clothesDetail.tryOnHint')}</p>
+                    </div>
+
+                    <div className="space-y-2">
+                        <label className="btn-secondary inline-flex cursor-pointer">
+                            <input type="file" accept="image/*" className="hidden" onChange={handlePersonImageChange} />
+                            {t('clothesDetail.tryOnUpload')}
+                        </label>
+                        {personImagePreview && (
+                            <img src={personImagePreview} alt="person preview" className="w-full max-h-80 object-contain rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800" />
+                        )}
+                    </div>
+
+                    <div>
+                        <button className="btn-primary" onClick={handleTryOn} disabled={tryOnLoading}>
+                            {tryOnLoading ? t('clothesDetail.tryOnGenerating') : t('clothesDetail.tryOnGenerate')}
+                        </button>
+                    </div>
+
+                    {tryOnError && (
+                        <p className="text-sm text-red-500">{tryOnError}</p>
+                    )}
+
+                    {tryOnResultUrl && (
+                        <div className="space-y-2">
+                            <h4 className="text-sm font-medium text-zinc-500">{t('clothesDetail.tryOnResult')}</h4>
+                            <img src={tryOnResultUrl} alt="try on result" className="w-full max-h-[28rem] object-contain rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800" />
+                        </div>
+                    )}
                 </section>
             </div>
         </div>

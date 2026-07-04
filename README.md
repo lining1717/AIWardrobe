@@ -31,6 +31,9 @@ Upload clothing photos, remove backgrounds automatically, classify garments with
 | **Weather-Based Styling** | Integrates free global weather data (Open-Meteo) to generate outfit suggestions based on real-time conditions |
 | **Digital Wardrobe** | Browse, search, and manage your clothing in a structured wardrobe view |
 | **AI Recommendations** | Supports Gemini and OpenAI-compatible providers for personalized outfit generation |
+| **Recommendation Modes** | Switch between `balanced`, `goal_first`, and `wardrobe_first` to match different styling priorities |
+| **Explainable Picks** | Shows selection reasons for top/bottom/shoes so each outfit choice is traceable |
+| **Voice Goal Input** | Use microphone input for scenarios like commute/date/sport to guide recommendation intent |
 | **Responsive UI** | Optimized for desktop, tablet, and mobile with a modern Tailwind CSS interface |
 
 ## 📸 Screenshots (New UI)
@@ -68,13 +71,11 @@ Upload clothing photos, remove backgrounds automatically, classify garments with
 - **Node.js** `v20+` &nbsp;|&nbsp; **Python** `v3.10+`
 - [Google Gemini API Key](https://aistudio.google.com/app/apikey) or an OpenAI-compatible API key
 
-### 1. Clone & Configure
+### 1. Clone
 
 ```bash
 git clone https://github.com/leoz9/AIWardrobe.git
 cd AIWardrobe
-cp backend/.env.example backend/.env
-# Edit backend/.env and fill in your API keys
 ```
 
 ### 2. Install Dependencies
@@ -106,6 +107,8 @@ After startup:
 - **Backend API:** http://localhost:8000
 - **API Docs:** http://localhost:8000/docs
 
+Then open **Settings** in the UI to fill API Base/API Key/Model visually.
+
 <details>
 <summary><b>Manual start (separate terminals)</b></summary>
 
@@ -120,15 +123,32 @@ cd frontend && npm run dev
 
 </details>
 
-## 🐳 Docker Deployment
+## 🧠 Recommendation API (Modes, Goal, Explainability)
+
+`GET /api/recommendation`
+
+Common query params:
+- `location`: city string or coordinates
+- `mode`: `balanced` | `goal_first` | `wardrobe_first`
+- `goal`: optional scenario, e.g. `commute`, `date`, `sport`, `interview`
+
+Example:
+
+```bash
+curl "http://localhost:8000/api/recommendation?location=Shanghai,Shanghai,China&mode=goal_first&goal=commute"
+```
+
+Response highlights:
+- `mode`: applied recommendation mode
+- `goal_raw` / `goal_normalized`: user goal and normalized intent
+- `selection_reasons`: explainable reasons for top/bottom/shoes selection
+
 
 ### Quick Start (Local Build)
 
 ```bash
-cp backend/.env.example backend/.env
 docker build -t aiwardrobe:local .
 docker run -d --name ai_wardrobe -p 8000:8000 \
-  --env-file backend/.env \
   -v $(pwd)/backend/uploads:/app/backend/uploads \
   -v $(pwd)/backend/data:/app/backend/data \
   aiwardrobe:local
@@ -139,7 +159,6 @@ docker run -d --name ai_wardrobe -p 8000:8000 \
 ```bash
 docker pull ghcr.io/leoz9/aiwardrobe:latest
 docker run -d --name ai_wardrobe -p 8000:8000 \
-  --env-file backend/.env \
   -v $(pwd)/backend/uploads:/app/backend/uploads \
   -v $(pwd)/backend/data:/app/backend/data \
   ghcr.io/leoz9/aiwardrobe:latest
@@ -149,13 +168,13 @@ docker run -d --name ai_wardrobe -p 8000:8000 \
 
 ```bash
 git clone https://github.com/leoz9/AIWardrobe.git && cd AIWardrobe
-cp backend/.env.example backend/.env  # Edit .env with your API keys
 docker compose up --build -d
 ```
 
 Access at http://localhost:8000 &nbsp;|&nbsp; API docs at http://localhost:8000/docs
 
 Data is persisted in `backend/data` and `backend/uploads`.
+A few sample clothing images are included under `backend/uploads/demo` for quick体验.
 
 ## ⭐ Star History
 

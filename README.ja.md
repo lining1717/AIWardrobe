@@ -31,6 +31,9 @@
 | **天気連動スタイリング** | Open-Meteo の無料グローバル天気 API を利用し、リアルタイム天気に基づいたコーディネートを提案 |
 | **デジタルワードローブ** | 構造化されたビューで衣類を閲覧・検索・管理 |
 | **AI レコメンデーション** | Gemini や OpenAI 互換プロバイダーによるパーソナライズされたコーディネート生成 |
+| **提案モード切替** | `balanced` / `goal_first` / `wardrobe_first` を切り替えて提案方針を調整可能 |
+| **説明可能な提案** | トップス・ボトムス・シューズごとに選定理由を表示 |
+| **音声で目的入力** | 通勤・デート・スポーツなどの目的をマイク入力して提案を最適化 |
 | **レスポンシブ UI** | Tailwind CSS によるモダンなインターフェースで、デスクトップ・タブレット・モバイルに対応 |
 
 ## 📸 スクリーンショット（新 UI）
@@ -68,13 +71,11 @@
 - **Node.js** `v20+` &nbsp;|&nbsp; **Python** `v3.10+`
 - [Google Gemini API Key](https://aistudio.google.com/app/apikey) または OpenAI 互換 API キー
 
-### 1. クローンと設定
+### 1. クローン
 
 ```bash
 git clone https://github.com/leoz9/AIWardrobe.git
 cd AIWardrobe
-cp backend/.env.example backend/.env
-# backend/.env を編集し、API キーを入力してください
 ```
 
 ### 2. 依存関係のインストール
@@ -106,6 +107,8 @@ start.bat
 - **バックエンド API:** http://localhost:8000
 - **API ドキュメント:** http://localhost:8000/docs
 
+その後、フロントエンドの **設定** 画面で API Base / API Key / Model をGUIで入力できます。
+
 <details>
 <summary><b>手動起動（ターミナルを2つ使用）</b></summary>
 
@@ -120,15 +123,32 @@ cd frontend && npm run dev
 
 </details>
 
-## 🐳 Docker デプロイ
+## 🧠 Recommendation API（モード / 目的 / 説明可能性）
+
+`GET /api/recommendation`
+
+主なクエリパラメータ：
+- `location`：都市名または緯度経度
+- `mode`：`balanced` | `goal_first` | `wardrobe_first`
+- `goal`：任意の目的（例：`commute`、`date`、`sport`、`interview`）
+
+例：
+
+```bash
+curl "http://localhost:8000/api/recommendation?location=Shanghai,Shanghai,China&mode=goal_first&goal=commute"
+```
+
+主なレスポンス項目：
+- `mode`：適用された提案モード
+- `goal_raw` / `goal_normalized`：入力目的と正規化後の目的
+- `selection_reasons`：トップス/ボトムス/シューズの選定理由
+
 
 ### クイックスタート（ローカルビルド）
 
 ```bash
-cp backend/.env.example backend/.env
 docker build -t aiwardrobe:local .
 docker run -d --name ai_wardrobe -p 8000:8000 \
-  --env-file backend/.env \
   -v $(pwd)/backend/uploads:/app/backend/uploads \
   -v $(pwd)/backend/data:/app/backend/data \
   aiwardrobe:local
@@ -139,7 +159,6 @@ docker run -d --name ai_wardrobe -p 8000:8000 \
 ```bash
 docker pull ghcr.io/leoz9/aiwardrobe:latest
 docker run -d --name ai_wardrobe -p 8000:8000 \
-  --env-file backend/.env \
   -v $(pwd)/backend/uploads:/app/backend/uploads \
   -v $(pwd)/backend/data:/app/backend/data \
   ghcr.io/leoz9/aiwardrobe:latest
@@ -149,13 +168,13 @@ docker run -d --name ai_wardrobe -p 8000:8000 \
 
 ```bash
 git clone https://github.com/leoz9/AIWardrobe.git && cd AIWardrobe
-cp backend/.env.example backend/.env  # .env を編集し、API キーを入力
 docker compose up --build -d
 ```
 
 http://localhost:8000 でアクセス &nbsp;|&nbsp; API ドキュメント http://localhost:8000/docs
 
 データは `backend/data` と `backend/uploads` に永続化されます。
+すぐ試せるサンプル衣類画像を `backend/uploads/demo` に同梱しています。
 
 ## ⭐ Star History
 

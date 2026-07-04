@@ -17,14 +17,12 @@ If you are developing a production application, we recommend using TypeScript wi
 
 ## Screenshots
 
-### Input
+<p align="center">
+  <img src="../docs/images/screenshot_input.jpg" alt="Input Screenshot" width="170" />
+  <img src="../docs/images/screenshot_landing.jpg" alt="Landing Screenshot" width="170" />
+  <img src="../docs/images/screenshot_wardrobe.jpg" alt="Wardrobe Screenshot" width="170" />
+</p>
 
-![Input Screenshot](../docs/images/screenshot_input.jpg)
-
-### Landing
-
-![Landing Screenshot](../docs/images/screenshot_landing.jpg)
-
-### Wardrobe
-
-![Wardrobe Screenshot](../docs/images/screenshot_wardrobe.jpg)
+<p align="center">
+  <sub>Input</sub> · <sub>Landing</sub> · <sub>Wardrobe</sub>
+</p>

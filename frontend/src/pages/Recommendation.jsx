@@ -26,12 +26,14 @@ export default function Recommendation() {
         purchaseSuggestions,
         goalRaw,
         goalNormalized,
+        mode,
         selectedCity,
         fetchRecommendation
     } = useRecommendation()
 
     const [displayedRecommendation, setDisplayedRecommendation] = useState('')
     const [goalInput, setGoalInput] = useState('')
+    const [selectedMode, setSelectedMode] = useState('balanced')
     const [isListening, setIsListening] = useState(false)
     const [speechSupported, setSpeechSupported] = useState(false)
     const [speechError, setSpeechError] = useState('')
@@ -59,6 +61,12 @@ export default function Recommendation() {
 
         return () => clearInterval(timer)
     }, [recommendation])
+
+    useEffect(() => {
+        if (mode) {
+            setSelectedMode(mode)
+        }
+    }, [mode])
 
     useEffect(() => {
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
@@ -118,6 +126,9 @@ export default function Recommendation() {
     }
 
     const toggleListening = () => {
+        if (loading) {
+            return
+        }
         const recognition = recognitionRef.current
         if (!recognition || !speechSupported) {
             setSpeechError(t('recommendation.voiceUnsupported'))
@@ -141,11 +152,17 @@ export default function Recommendation() {
     }
 
     const refreshRecommendation = () => {
-        void fetchRecommendation(selectedCity.id, selectedCity.name, goalInput)
+        if (loading) {
+            return
+        }
+        void fetchRecommendation(selectedCity.id, selectedCity.name, goalInput, selectedMode)
     }
 
     const generateRecommendation = () => {
-        void fetchRecommendation(selectedCity.id, selectedCity.name, goalInput)
+        if (loading) {
+            return
+        }
+        void fetchRecommendation(selectedCity.id, selectedCity.name, goalInput, selectedMode)
     }
 
     const getWeatherIcon = (icon) => {
@@ -169,26 +186,29 @@ export default function Recommendation() {
         if (!item) {
             return null
         }
+        const reasonText = reason || t('recommendation.reasonFallback')
         return (
             <div className="card group overflow-hidden shadow-sm hover:shadow-md transition-shadow">
                 <div className="px-3 py-2 border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800">
                     <span className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">{label}</span>
                 </div>
                 <div className="aspect-square bg-zinc-100/50 dark:bg-zinc-800/50 p-4 border-b border-zinc-100 dark:border-zinc-800 relative overflow-hidden">
-                    <img
-                        src={toImageUrl(item.image_url)}
-                        alt={item.item}
-                        className="w-full h-full object-contain filter drop-shadow-sm group-hover:scale-105 transition-transform duration-500"
-                    />
+                    {item.image_url ? (
+                        <img
+                            src={toImageUrl(item.image_url)}
+                            alt={item.item}
+                            className="w-full h-full object-contain filter drop-shadow-sm group-hover:scale-105 transition-transform duration-500"
+                        />
+                    ) : (
+                        <div className="w-full h-full rounded-lg bg-zinc-100 dark:bg-zinc-800" />
+                    )}
                 </div>
                 <div className="p-3">
                     <div className="text-sm font-medium text-zinc-900 dark:text-zinc-100 truncate">{item.item}</div>
                     {item.description && (
                         <div className="text-xs text-zinc-400 mt-0.5 line-clamp-1">{item.description}</div>
                     )}
-                    {reason && (
-                        <div className="text-xs text-zinc-500 mt-2 leading-relaxed">{reason}</div>
-                    )}
+                    <div className="text-xs text-zinc-500 mt-2 leading-relaxed">{reasonText}</div>
                 </div>
             </div>
         )
@@ -208,9 +228,32 @@ export default function Recommendation() {
                     <p className="text-zinc-500 text-sm mb-8 leading-relaxed max-w-[260px] mx-auto">{t('recommendation.description')}</p>
                     <div className="w-full max-w-xs space-y-3 mb-4 text-left">
                         <label className="block text-xs font-semibold text-zinc-500 uppercase tracking-wide">
+                            {t('recommendation.modeLabel')}
+                        </label>
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                            {['balanced', 'goal_first', 'wardrobe_first'].map((option) => (
+                                <button
+                                    key={option}
+                                    type="button"
+                                    className={`px-2 py-2 rounded-lg text-xs border transition-colors ${
+                                        selectedMode === option
+                                            ? 'border-accent bg-accent/10 text-accent'
+                                            : 'border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-300'
+                                    }`}
+                                    disabled={loading}
+                                    onClick={() => setSelectedMode(option)}
+                                >
+                                    {t(`recommendation.mode.${option}`)}
+                                </button>
+                            ))}
+                        </div>
+                        <div className="text-[11px] text-zinc-500 leading-relaxed">
+                            {t(`recommendation.modeHint.${selectedMode}`)}
+                        </div>
+                        <label className="block text-xs font-semibold text-zinc-500 uppercase tracking-wide">
                             {t('recommendation.goalLabel')}
                         </label>
-                        <div className="flex items-center gap-2">
+                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                             <input
                                 className="input flex-1"
                                 value={goalInput}
@@ -219,9 +262,9 @@ export default function Recommendation() {
                             />
                             <button
                                 type="button"
-                                className="btn-secondary px-3"
+                                className="btn-secondary px-3 w-full sm:w-auto justify-center"
                                 onClick={toggleListening}
-                                disabled={!speechSupported}
+                                disabled={!speechSupported || loading}
                                 title={speechSupported
                                     ? (isListening ? t('recommendation.voiceStop') : t('recommendation.voiceStart'))
                                     : t('recommendation.voiceUnsupported')}
@@ -230,9 +273,11 @@ export default function Recommendation() {
                             </button>
                         </div>
                         <div className="text-[11px] text-zinc-500 leading-relaxed">
-                            {speechSupported
-                                ? (isListening ? t('recommendation.voiceListening') : t('recommendation.goalHint'))
-                                : t('recommendation.voiceUnsupported')}
+                            {!speechSupported
+                                ? t('recommendation.voiceUnsupported')
+                                : loading
+                                    ? t('recommendation.voiceBusy')
+                                    : (isListening ? t('recommendation.voiceListening') : t('recommendation.goalHint'))}
                         </div>
                         {speechError && (
                             <div className="text-[11px] text-red-600 dark:text-red-300 leading-relaxed">
@@ -242,8 +287,9 @@ export default function Recommendation() {
                     </div>
 
                     <button
-                        className="btn-primary w-full max-w-xs shadow-lg shadow-blue-500/30 hover:shadow-blue-500/40 py-3.5 rounded-xl border-none focus:ring-blue-500/50"
+                        className="btn-primary w-full max-w-xs shadow-lg shadow-blue-500/30 hover:shadow-blue-500/40 py-3.5 rounded-xl border-none focus:ring-blue-500/50 disabled:opacity-60"
                         onClick={generateRecommendation}
+                        disabled={loading}
                     >
                         <Sparkles size={18} className="animate-pulse" />
                         <span className="font-semibold tracking-wide">{t('recommendation.generate')}</span>
@@ -266,7 +312,7 @@ export default function Recommendation() {
             )}
 
             {!loading && weather && (
-                <div className="flex-1 overflow-y-auto px-4 z-10 space-y-6">
+                <div className="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 z-10 space-y-6 max-w-6xl mx-auto w-full">
                     {error && (
                         <div className="bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-900/40 rounded-2xl p-3 text-xs text-red-700 dark:text-red-200">
                             {error}
@@ -398,7 +444,7 @@ export default function Recommendation() {
                     {suggestedAccessories.length > 0 && (
                         <div className="space-y-3">
                             <h3 className="font-serif font-bold text-zinc-900 dark:text-zinc-100 tracking-tight text-lg pl-1">{t('recommendation.accessories')}</h3>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                                 {suggestedAccessories.map((accessory, index) => (
                                     <div key={`${accessory.name}-${index}`} className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-4">
                                         <div className="flex items-start justify-between gap-3">

@@ -3,7 +3,7 @@ AI穿搭推荐 API 路由
 基于天气的智能穿搭推荐
 """
 from fastapi import APIRouter, HTTPException, Query
-from typing import Optional
+from typing import Literal, Optional
 from services.weather import get_weather, normalize_location_request, DEFAULT_LOCATION_QUERY
 from services.recommendation import get_ai_recommendation
 from pydantic import BaseModel, Field
@@ -26,6 +26,7 @@ class RecommendationResponse(BaseModel):
     purchase_suggestions: list[dict] = Field(default_factory=list)
     goal_raw: Optional[str] = None
     goal_normalized: Optional[str] = None
+    mode: str = "balanced"
 
 
 @router.get("/recommendation", response_model=RecommendationResponse)
@@ -42,6 +43,10 @@ async def get_outfit_recommendation(
         description="可选，临时指定星座（会覆盖设置中的星座）"
     ),
     goal: Optional[str] = Query(default=None, description="可选，用户本次穿搭目标/场景"),
+    mode: Literal["balanced", "goal_first", "wardrobe_first"] = Query(
+        default="balanced",
+        description="推荐模式：balanced / goal_first / wardrobe_first"
+    ),
 ):
     """
     获取AI穿搭推荐
@@ -66,7 +71,11 @@ async def get_outfit_recommendation(
     if not weather:
         raise HTTPException(status_code=500, detail="获取天气信息失败")
     
-    # 获取AI推荐
-    recommendation = await get_ai_recommendation(weather, zodiac_sign=zodiac_sign, goal=goal)
+    recommendation = await get_ai_recommendation(
+        weather,
+        zodiac_sign=zodiac_sign,
+        goal=goal,
+        mode=mode,
+    )
     
     return recommendation

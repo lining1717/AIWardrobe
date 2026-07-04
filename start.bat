@@ -2,13 +2,7 @@
 chcp 65001 >nul
 echo 🚀 启动 AI 智能衣柜...
 
-REM 检查 backend/.env 是否存在
-if not exist "backend\.env" (
-    echo ⚠️  请先配置 backend\.env 文件（参考 backend\.env.example）
-    echo    即把 backend\.env.example 复制为 backend\.env 并填入 API Key
-    pause
-    exit /b
-)
+echo ℹ️  首次使用可在前端设置页可视化填写 API 配置（无需先复制 .env）
 
 REM 启动后端
 echo 📦 正在启动后端服务 (FastAPI)...

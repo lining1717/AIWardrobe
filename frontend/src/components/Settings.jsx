@@ -78,6 +78,10 @@ const Settings = ({ isOpen, onClose, onSave }) => {
         model: 'gpt-4o',
         removebg_api_key: '',
         bg_removal_method: 'local',
+        tryon_provider: 'disabled',
+        tryon_api_url: '',
+        tryon_api_key: '',
+        tryon_model: '',
         weather_location: DEFAULT_LOCATION,
         zodiac_sign: ''
     })
@@ -87,10 +91,12 @@ const Settings = ({ isOpen, onClose, onSave }) => {
     const [testResult, setTestResult] = useState(null)
     const [hasExistingKey, setHasExistingKey] = useState(false)
     const [hasRemoveBgKey, setHasRemoveBgKey] = useState(false)
+    const [hasTryonApiKey, setHasTryonApiKey] = useState(false)
     const [showModelSelect, setShowModelSelect] = useState(false)
     const [locationSuggestions, setLocationSuggestions] = useState([])
     const [searchingLocations, setSearchingLocations] = useState(false)
     const [showLocationDropdown, setShowLocationDropdown] = useState(false)
+    const [installingRembg, setInstallingRembg] = useState(false)
     const locationPickerRef = useRef(null)
 
     useEffect(() => {
@@ -195,11 +201,15 @@ const Settings = ({ isOpen, onClose, onSave }) => {
                     api_base: data.api_base || 'https://api.openai.com/v1',
                     model: data.model || 'gpt-4o',
                     bg_removal_method: data.bg_removal_method || 'local',
+                    tryon_provider: data.tryon_provider || 'disabled',
+                    tryon_api_url: data.tryon_api_url || '',
+                    tryon_model: data.tryon_model || '',
                     weather_location: data.weather_location || DEFAULT_LOCATION,
                     zodiac_sign: data.zodiac_sign || ''
                 }))
                 setHasExistingKey(data.has_api_key)
                 setHasRemoveBgKey(data.has_removebg_key)
+                setHasTryonApiKey(data.has_tryon_api_key)
             }
         } catch (error) {
             if (error.name !== 'AbortError') {
@@ -256,6 +266,27 @@ const Settings = ({ isOpen, onClose, onSave }) => {
         }
     }
 
+    const handleInstallRembg = async () => {
+        setInstallingRembg(true)
+        try {
+            const response = await fetch(`${API_BASE}/install-rembg`, {
+                method: 'POST'
+            })
+            const data = await response.json().catch(() => ({}))
+            setTestResult({
+                success: Boolean(data.success),
+                message: data.message || (data.success ? t('settings.installRembgSuccess') : t('settings.installRembgFailed'))
+            })
+        } catch {
+            setTestResult({
+                success: false,
+                message: t('settings.installRembgFailed')
+            })
+        } finally {
+            setInstallingRembg(false)
+        }
+    }
+
     const handleSave = async (closeAfter = true) => {
         try {
             const normalizedLocation = (config.weather_location || '').trim() || DEFAULT_LOCATION
@@ -271,6 +302,9 @@ const Settings = ({ isOpen, onClose, onSave }) => {
                 api_base: config.api_base,
                 model: config.model,
                 bg_removal_method: config.bg_removal_method,
+                tryon_provider: config.tryon_provider,
+                tryon_api_url: config.tryon_api_url,
+                tryon_model: config.tryon_model,
                 weather_location: normalizedLocation,
                 zodiac_sign: config.zodiac_sign
             }
@@ -280,6 +314,9 @@ const Settings = ({ isOpen, onClose, onSave }) => {
             }
             if (config.removebg_api_key) {
                 payload.removebg_api_key = config.removebg_api_key
+            }
+            if (config.tryon_api_key) {
+                payload.tryon_api_key = config.tryon_api_key
             }
 
             const response = await fetch(`${API_BASE}/config`, {
@@ -592,6 +629,64 @@ const Settings = ({ isOpen, onClose, onSave }) => {
                                 ))}
                             </div>
                         </div>
+
+                        <div className="pt-2 space-y-3">
+                            <div className="text-xs font-bold tracking-widest text-zinc-400 uppercase">{t('settings.tryOnSection')}</div>
+
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">{t('settings.tryOnProvider')}</label>
+                                <select
+                                    className="input-field appearance-none"
+                                    value={config.tryon_provider}
+                                    onChange={e => setConfig(prev => ({ ...prev, tryon_provider: e.target.value }))}
+                                >
+                                    <option value="disabled">{t('settings.tryOnDisabled')}</option>
+                                    <option value="custom">{t('settings.tryOnCustom')}</option>
+                                </select>
+                            </div>
+
+                            {config.tryon_provider === 'custom' && (
+                                <>
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">{t('settings.tryOnApiUrl')}</label>
+                                        <input
+                                            type="url"
+                                            className="input-field"
+                                            value={config.tryon_api_url}
+                                            onChange={e => setConfig(prev => ({ ...prev, tryon_api_url: e.target.value }))}
+                                            placeholder={t('settings.tryOnApiUrlPlaceholder')}
+                                        />
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300 flex justify-between">
+                                            {t('settings.tryOnApiKey')}
+                                            {hasTryonApiKey && !config.tryon_api_key && (
+                                                <span className="text-green-500 font-normal text-xs bg-green-50 dark:bg-green-900/30 px-2 py-0.5 rounded">{t('settings.configured')}</span>
+                                            )}
+                                        </label>
+                                        <input
+                                            type="password"
+                                            className="input-field font-mono"
+                                            value={config.tryon_api_key}
+                                            onChange={e => setConfig(prev => ({ ...prev, tryon_api_key: e.target.value }))}
+                                            placeholder={hasTryonApiKey ? `••••••••（${t('settings.keepEmpty')}）` : 'Bearer token'}
+                                        />
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">{t('settings.tryOnModel')}</label>
+                                        <input
+                                            type="text"
+                                            className="input-field"
+                                            value={config.tryon_model}
+                                            onChange={e => setConfig(prev => ({ ...prev, tryon_model: e.target.value }))}
+                                            placeholder={t('settings.tryOnModelPlaceholder')}
+                                        />
+                                    </div>
+                                </>
+                            )}
+                        </div>
                     </div>
 
                     <div className="h-px bg-zinc-200/60 dark:bg-zinc-700/60 w-full" />
@@ -613,6 +708,18 @@ const Settings = ({ isOpen, onClose, onSave }) => {
                                 <div className="flex flex-col">
                                     <span className="font-medium text-zinc-900 dark:text-zinc-100 text-sm">{t('settings.localRembg')}</span>
                                     <span className="text-xs text-zinc-500 mt-0.5">{t('settings.localRembgDesc')}</span>
+                                    <span className="text-[11px] text-zinc-500 mt-1">{t('settings.localRembgOptional')}</span>
+                                    <div className="mt-2 flex items-center gap-2">
+                                        <button
+                                            type="button"
+                                            className="btn-secondary !py-1.5 !px-2 text-xs"
+                                            onClick={handleInstallRembg}
+                                            disabled={installingRembg}
+                                        >
+                                            {installingRembg ? t('settings.installingRembg') : t('settings.installRembg')}
+                                        </button>
+                                        <code className="inline-block rounded bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 text-[11px] text-zinc-700 dark:text-zinc-200">{t('settings.localRembgInstall')}</code>
+                                    </div>
                                 </div>
                             </label>
 

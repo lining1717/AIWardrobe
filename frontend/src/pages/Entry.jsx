@@ -209,8 +209,8 @@ export default function Entry() {
     }
 
     return (
-        <div className="min-h-screen bg-[var(--bg-primary)] p-4 flex flex-col pt-safe">
-            <header className="flex items-center justify-between mb-6 mt-4">
+        <div className="min-h-screen bg-[var(--bg-primary)] p-4 sm:px-6 lg:px-8 flex flex-col pt-safe">
+            <header className="flex items-center justify-between mb-6 mt-4 max-w-6xl mx-auto w-full">
                 <h1 className="text-3xl font-serif font-bold tracking-tight text-[var(--text-primary)]">{t('entry.title')}</h1>
                 <button
                     className="p-2.5 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600 rounded-xl shadow-sm transition-all hover:-translate-y-0.5"
@@ -220,7 +220,7 @@ export default function Entry() {
                 </button>
             </header>
 
-            <section className="card p-5 mb-5">
+            <section className="card p-5 mb-5 max-w-6xl mx-auto w-full">
                 <div className="flex items-start justify-between gap-3">
                     <div>
                         <p className="text-xs tracking-widest text-zinc-500 uppercase">{t('entry.heroTag')}</p>
@@ -232,7 +232,7 @@ export default function Entry() {
                     </div>
                 </div>
 
-                <div className="mt-4 grid grid-cols-2 gap-2">
+                <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-2">
                     <button className="btn-secondary" onClick={() => navigate('/wardrobe')}>
                         <Shirt size={16} />
                         {t('entry.goWardrobe')}
@@ -259,7 +259,7 @@ export default function Entry() {
                 </div>
             </section>
 
-            <div className="flex-1 overflow-y-auto">
+            <div className="flex-1 overflow-y-auto max-w-6xl mx-auto w-full">
                 <Upload onUploadSuccess={handleUploadSuccess} />
             </div>
 
