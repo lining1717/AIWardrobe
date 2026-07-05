@@ -86,6 +86,38 @@ def extract_json_from_response(text: str) -> dict:
     raise ValueError(f"无法从响应中提取 JSON: {text}")
 
 
+def _normalize_semantics_result(result, raw_content: str = "") -> dict:
+    """
+    规范化 AI 返回的语义数据：
+    1. 处理 list 情况（Gemini 有时返回数组而非对象）
+    2. 兼容字段名差异（部分模型用别名）
+    """
+    # 处理 list：取第一个 dict 元素
+    if isinstance(result, list):
+        result = next((x for x in result if isinstance(x, dict)), None)
+        if result is None:
+            raise ValueError(f"AI 返回 JSON 数组但无有效对象: {raw_content[:200]}")
+
+    if not isinstance(result, dict):
+        raise ValueError(f"AI 返回 JSON 格式异常（期望对象）: {raw_content[:200]}")
+
+    # 字段名兼容映射（部分模型用别名）
+    field_aliases = {
+        "item_name": "item",
+        "name": "item",
+        "style": "style_semantics",
+        "season": "season_semantics",
+        "usage": "usage_semantics",
+        "occasion": "usage_semantics",
+        "color": "color_semantics",
+    }
+    for alias, canonical in field_aliases.items():
+        if alias in result and canonical not in result:
+            result[canonical] = result.pop(alias)
+
+    return result
+
+
 async def analyze_clothes_openai(image_bytes: bytes) -> ClothesSemantics:
     """
     使用 OpenAI 兼容 API 分析衣物图片
@@ -154,5 +186,8 @@ async def analyze_clothes_openai(image_bytes: bytes) -> ClothesSemantics:
         
         # 解析 JSON
         result = extract_json_from_response(content)
-        
+
+        # 防御性处理：Gemini 有时返回 list 或字段名不一致
+        result = _normalize_semantics_result(result, content)
+
         return ClothesSemantics(**result)
