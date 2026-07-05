@@ -2,6 +2,7 @@
 配置存储 - 使用 JSON 文件持久化配置
 """
 import json
+import os
 from pathlib import Path
 from typing import Optional
 from domain.config import LLMConfig, RecommendationModeWeights
@@ -12,11 +13,44 @@ _CONFIG_CACHE: Optional[LLMConfig] = None
 _CONFIG_MTIME: Optional[float] = None
 
 
+def _config_from_env() -> LLMConfig:
+    """从环境变量创建配置（部署场景：llm_config.json 不存在时自动初始化）
+
+    支持的环境变量：
+    - LLM_API_BASE: API 基础地址（默认 Gemini OpenAI 兼容端点）
+    - LLM_API_KEY: LLM API Key
+    - LLM_MODEL: 模型名（默认 gemini-2.5-flash）
+    - REMOVEBG_API_KEY: remove.bg API Key
+    - BG_REMOVAL_METHOD: 去背景方式（local / removebg，默认 local）
+    """
+    bg_method = os.getenv("BG_REMOVAL_METHOD", "local")
+    if bg_method not in ("local", "removebg"):
+        bg_method = "local"
+    return LLMConfig(
+        api_base=os.getenv("LLM_API_BASE", "https://generativelanguage.googleapis.com/v1beta/openai/v1"),
+        api_key=os.getenv("LLM_API_KEY", ""),
+        model=os.getenv("LLM_MODEL", "gemini-2.5-flash"),
+        removebg_api_key=os.getenv("REMOVEBG_API_KEY", ""),
+        bg_removal_method=bg_method,
+    )
+
+
 def load_config() -> LLMConfig:
     """加载 LLM 配置"""
     global _CONFIG_CACHE, _CONFIG_MTIME
 
     if not CONFIG_FILE.exists():
+        # 部署场景：llm_config.json 不存在时，尝试从环境变量初始化
+        env_config = _config_from_env()
+        if env_config.api_key or env_config.removebg_api_key:
+            try:
+                save_config(env_config)
+                return env_config
+            except Exception:
+                # 磁盘只读等场景，返回内存配置
+                _CONFIG_CACHE = env_config
+                _CONFIG_MTIME = None
+                return _CONFIG_CACHE
         _CONFIG_CACHE = LLMConfig()
         _CONFIG_MTIME = None
         return _CONFIG_CACHE

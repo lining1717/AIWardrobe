@@ -131,7 +131,7 @@ async def analyze_clothes_openai(image_bytes: bytes) -> ClothesSemantics:
                 ]
             }
         ],
-        "max_tokens": 1000
+        "max_tokens": 8192
     }
     
     async with httpx.AsyncClient(timeout=60.0) as client:

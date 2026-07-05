@@ -1,0 +1,44 @@
+# Render 部署配置 (Blueprint)
+# 文档: https://render.com/docs/blueprint-spec
+#
+# 使用方式：
+# 1. 把仓库推到 GitHub
+# 2. Render 后台 → New → Blueprint → 连接仓库 → 自动识别此文件
+# 3. 在 Render 后台填写标记为 sync: false 的敏感环境变量
+services:
+  - type: web
+    name: ai-wardrobe
+    runtime: docker
+    # plan: free 免费层（15 分钟无访问会休眠，无持久化磁盘）
+    # 改为 starter（$7/月）可常驻 + 支持 1GB 持久化磁盘
+    plan: free
+    # region: singapore 新加坡节点（国内访问相对友好）
+    # 其他可选: oregon, frankfurt, ohio
+    region: singapore
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /health
+    autoDeploy: true  # 推送代码到 GitHub 自动触发部署
+    envVars:
+      # ---- LLM 配置（首次启动自动写入 llm_config.json）----
+      - key: LLM_API_BASE
+        value: https://generativelanguage.googleapis.com/v1beta/openai/v1
+      - key: LLM_API_KEY
+        # sync: false 表示不在仓库里存值，需在 Render 后台手动填
+        sync: false
+      - key: LLM_MODEL
+        value: gemini-2.5-flash
+      # ---- 去背景配置 ----
+      # 部署建议用 removebg（云端 API），避免 rembg 本地 ONNX 推理的内存压力
+      - key: REMOVEBG_API_KEY
+        sync: false
+      - key: BG_REMOVAL_METHOD
+        value: removebg
+      # ---- 数据库路径 ----
+      - key: DB_FILE_PATH
+        value: /app/backend/data/wardrobe.db
+    # ---- 持久化磁盘（需要 starter 及以上 plan，free 不支持）----
+    # 升级到 starter 后取消下面注释，可持久化 SQLite 数据库 + llm_config.json
+    # disks:
+    #   - name: data
+    #     mountPath: /app/backend/data
+    #     sizeGB: 1
