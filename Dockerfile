@@ -32,5 +32,5 @@ WORKDIR /app/backend
 
 EXPOSE 8000
 
-# Render 通过 $PORT 环境变量指定端口；本地/Docker 默认 8000
-CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000}"]
+# 固定监听 8000 端口；在 Render Settings 里把 Port 设为 8000
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
