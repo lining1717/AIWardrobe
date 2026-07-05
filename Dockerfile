@@ -30,7 +30,7 @@ RUN mkdir -p /app/backend/uploads /app/backend/data
 
 WORKDIR /app/backend
 
-EXPOSE 8000
+EXPOSE 10000
 
-# 固定监听 8000 端口；在 Render Settings 里把 Port 设为 8000
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Render 默认期望服务监听 10000 端口；本地开发可用 PORT=8000 覆盖
+CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port ${PORT:-10000}"]
