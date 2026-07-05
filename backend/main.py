@@ -1,7 +1,7 @@
 """
 AI 智能衣柜 - FastAPI 后端入口
 """
-from fastapi import FastAPI
+from fastapi import FastAPI, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
@@ -82,6 +82,12 @@ async def api_info():
             "tryon": "POST /api/tryon"
         }
     }
+
+
+@app.head("/", include_in_schema=False)
+async def head_root():
+    """Render 端口扫描支持 - HEAD / 返回 200"""
+    return Response(status_code=200)
 
 
 @app.get("/health")
