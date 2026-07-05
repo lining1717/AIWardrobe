@@ -40,14 +40,14 @@ export default function ClothesDetail() {
         }
     }
 
-    const renderTags = (values) => {
+    const renderTags = (values, tone = 'champagne') => {
         if (!Array.isArray(values) || values.length === 0) {
-            return <span className="text-sm text-zinc-400">{t('clothesDetail.empty')}</span>
+            return <span className="text-sm text-[var(--muted-foreground)]">{t('clothesDetail.empty')}</span>
         }
         return (
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-1.5">
                 {values.map(value => (
-                    <span key={value} className="px-2 py-1 text-xs rounded-md bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300">
+                    <span key={value} className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs tag-${tone}`}>
                         {value}
                     </span>
                 ))}
@@ -103,23 +103,26 @@ export default function ClothesDetail() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-[var(--bg-primary)] flex flex-col items-center justify-center">
-                <div className="w-10 h-10 border-4 border-zinc-200 dark:border-zinc-700 border-t-accent rounded-full animate-spin"></div>
-                <p className="mt-4 text-sm text-zinc-500">{t('clothesDetail.loading')}</p>
+            <div className="flex flex-col items-center justify-center min-h-screen">
+                <div className="w-10 h-10 border-4 border-[var(--border)] border-t-champagne rounded-full animate-spin" />
+                <p className="mt-4 text-sm text-[var(--muted-foreground)]">{t('clothesDetail.loading')}</p>
             </div>
         )
     }
 
     if (!item || error) {
         return (
-            <div className="min-h-screen bg-[var(--bg-primary)] p-4">
-                <header className="glass-header px-4 py-4 -mx-4">
-                    <button className="btn-icon" onClick={() => navigate('/wardrobe')}>
-                        <ArrowLeft size={22} />
+            <div className="px-5 pt-8 max-w-6xl mx-auto w-full">
+                <header className="mb-6">
+                    <button
+                        className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--bg-card)] text-[var(--text-secondary)] shadow-soft hover:-translate-y-0.5 hover:text-champagne transition-all cursor-pointer"
+                        onClick={() => navigate('/wardrobe')}
+                    >
+                        <ArrowLeft size={20} />
                     </button>
                 </header>
-                <div className="mt-8 card p-6 text-center space-y-4">
-                    <p className="text-sm text-zinc-500">
+                <div className="rounded-[1.75rem] bg-[var(--bg-card)] p-8 text-center shadow-soft space-y-4">
+                    <p className="text-sm text-[var(--muted-foreground)]">
                         {error === 'NOT_FOUND' ? t('clothesDetail.notFound') : t('clothesDetail.loadFailed')}
                     </p>
                     <button className="btn-secondary mx-auto" onClick={fetchClothesDetail}>
@@ -132,62 +135,58 @@ export default function ClothesDetail() {
     }
 
     return (
-        <div className="min-h-screen bg-[var(--bg-primary)] pb-8 animate-fade-in">
-            <header className="glass-header px-4 py-4 sticky top-0">
-                <div className="flex items-center gap-2">
-                    <button className="btn-icon" onClick={() => navigate('/wardrobe')}>
-                        <ArrowLeft size={22} />
-                    </button>
-                    <h1 className="text-xl font-serif font-semibold text-[var(--text-primary)]">{t('clothesDetail.title')}</h1>
-                </div>
+        <div className="pb-28 md:pb-12 animate-fade-in max-w-6xl mx-auto w-full px-5 md:px-8 pt-8">
+            <header className="mb-6 flex items-center gap-3">
+                <button
+                    className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--bg-card)] text-[var(--text-secondary)] shadow-soft hover:-translate-y-0.5 hover:text-champagne transition-all cursor-pointer"
+                    onClick={() => navigate('/wardrobe')}
+                >
+                    <ArrowLeft size={20} />
+                </button>
+                <h1 className="font-serif text-2xl">{t('clothesDetail.title')}</h1>
             </header>
 
-            <div className="p-4 sm:px-6 lg:px-8 space-y-4 max-w-6xl mx-auto w-full lg:grid lg:grid-cols-12 lg:gap-4 lg:space-y-0">
-                <article className="card overflow-hidden lg:col-span-5">
-                    <div className="aspect-square bg-zinc-100 dark:bg-zinc-800 p-6 flex items-center justify-center">
+            <div className="space-y-4 lg:grid lg:grid-cols-12 lg:gap-4 lg:space-y-0">
+                <article className="overflow-hidden rounded-[1.75rem] bg-[var(--bg-card)] shadow-soft lg:col-span-5">
+                    <div className="aspect-square bg-[var(--secondary)] p-8 flex items-center justify-center">
                         <img
                             src={toImageUrl(item.image_url)}
                             alt={item.item}
                             className="w-full h-full object-contain drop-shadow-md"
                         />
                     </div>
-                    <div className="p-4 border-t border-zinc-100 dark:border-zinc-800">
-                        <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">{item.item}</h2>
-                        <p className="text-sm text-zinc-500 mt-1">{item.category}</p>
+                    <div className="p-5 border-t border-[var(--border)]">
+                        <h2 className="font-serif text-xl text-[var(--text-primary)]">{item.item}</h2>
+                        <p className="text-sm text-[var(--muted-foreground)] mt-1">{item.category}</p>
                     </div>
                 </article>
 
-                <section className="card p-4 space-y-4 lg:col-span-7">
-                    <div>
-                        <h3 className="text-sm font-medium text-zinc-500">{t('clothesDetail.description')}</h3>
-                        <p className="mt-1 text-sm text-zinc-800 dark:text-zinc-200">{item.description || t('clothesDetail.empty')}</p>
-                    </div>
+                <section className="rounded-[1.75rem] bg-[var(--bg-card)] p-6 shadow-soft space-y-5 lg:col-span-7">
+                    <DetailField label={t('clothesDetail.description')}>
+                        <p className="text-sm text-[var(--text-secondary)] leading-relaxed">{item.description || t('clothesDetail.empty')}</p>
+                    </DetailField>
 
-                    <div>
-                        <h3 className="text-sm font-medium text-zinc-500">{t('clothesDetail.color')}</h3>
-                        <p className="mt-1 text-sm text-zinc-800 dark:text-zinc-200">{item.color_semantics || t('clothesDetail.empty')}</p>
-                    </div>
+                    <DetailField label={t('clothesDetail.color')}>
+                        <p className="text-sm text-[var(--text-secondary)]">{item.color_semantics || t('clothesDetail.empty')}</p>
+                    </DetailField>
 
-                    <div>
-                        <h3 className="text-sm font-medium text-zinc-500">{t('clothesDetail.style')}</h3>
-                        <div className="mt-1">{renderTags(item.style_semantics)}</div>
-                    </div>
+                    <DetailField label={t('clothesDetail.style')}>
+                        {renderTags(item.style_semantics, 'champagne')}
+                    </DetailField>
 
-                    <div>
-                        <h3 className="text-sm font-medium text-zinc-500">{t('clothesDetail.season')}</h3>
-                        <div className="mt-1">{renderTags(item.season_semantics)}</div>
-                    </div>
+                    <DetailField label={t('clothesDetail.season')}>
+                        {renderTags(item.season_semantics, 'sage')}
+                    </DetailField>
 
-                    <div>
-                        <h3 className="text-sm font-medium text-zinc-500">{t('clothesDetail.usage')}</h3>
-                        <div className="mt-1">{renderTags(item.usage_semantics)}</div>
-                    </div>
+                    <DetailField label={t('clothesDetail.usage')}>
+                        {renderTags(item.usage_semantics, 'rose')}
+                    </DetailField>
                 </section>
 
-                <section className="card p-4 space-y-4 lg:col-span-12">
+                <section className="rounded-[1.75rem] bg-[var(--bg-card)] p-6 shadow-soft space-y-4 lg:col-span-12">
                     <div>
-                        <h3 className="text-sm font-medium text-zinc-500">{t('clothesDetail.tryOnTitle')}</h3>
-                        <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">{t('clothesDetail.tryOnHint')}</p>
+                        <h3 className="font-serif text-lg">{t('clothesDetail.tryOnTitle')}</h3>
+                        <p className="mt-1 text-sm text-[var(--muted-foreground)]">{t('clothesDetail.tryOnHint')}</p>
                     </div>
 
                     <div className="space-y-2">
@@ -196,7 +195,7 @@ export default function ClothesDetail() {
                             {t('clothesDetail.tryOnUpload')}
                         </label>
                         {personImagePreview && (
-                            <img src={personImagePreview} alt="person preview" className="w-full max-h-80 object-contain rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800" />
+                            <img src={personImagePreview} alt="person preview" className="w-full max-h-80 object-contain rounded-2xl border border-[var(--border)] bg-[var(--secondary)]" />
                         )}
                     </div>
 
@@ -207,17 +206,26 @@ export default function ClothesDetail() {
                     </div>
 
                     {tryOnError && (
-                        <p className="text-sm text-red-500">{tryOnError}</p>
+                        <p className="text-sm text-clay">{tryOnError}</p>
                     )}
 
                     {tryOnResultUrl && (
                         <div className="space-y-2">
-                            <h4 className="text-sm font-medium text-zinc-500">{t('clothesDetail.tryOnResult')}</h4>
-                            <img src={tryOnResultUrl} alt="try on result" className="w-full max-h-[28rem] object-contain rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800" />
+                            <h4 className="text-sm font-medium text-[var(--muted-foreground)]">{t('clothesDetail.tryOnResult')}</h4>
+                            <img src={tryOnResultUrl} alt="try on result" className="w-full max-h-[28rem] object-contain rounded-2xl border border-[var(--border)] bg-[var(--secondary)]" />
                         </div>
                     )}
                 </section>
             </div>
+        </div>
+    )
+}
+
+function DetailField({ label, children }) {
+    return (
+        <div>
+            <h3 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--muted-foreground)] mb-2">{label}</h3>
+            <div>{children}</div>
         </div>
     )
 }

@@ -17,20 +17,35 @@ export default function TabBar() {
 
     return (
         <>
+            {/* Mobile bottom tab bar — glass + champagne active pill */}
             <nav className="fixed bottom-0 left-0 right-0 z-50 pb-safe lg:hidden">
-                <div className="max-w-md mx-auto bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md border-t border-zinc-200 dark:border-zinc-800 shadow-sm">
-                    <div className="flex items-center justify-around h-16">
+                <div className="glass border-t border-[var(--border)]">
+                    <div className="mx-auto flex max-w-md items-stretch justify-around px-2 py-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
                         {tabs.map((tab) => {
                             const Icon = tab.icon
                             const isActive = location.pathname === tab.path
                             return (
                                 <button
                                     key={tab.path}
-                                    className={`flex flex-col items-center justify-center w-full h-full transition-colors duration-300 ${isActive ? 'text-accent' : 'text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300'}`}
+                                    className="relative flex flex-1 flex-col items-center gap-1 py-1.5"
                                     onClick={() => navigate(tab.path)}
                                 >
-                                    <Icon size={24} className={`mb-1 transition-transform duration-300 ${isActive ? 'scale-110 stroke-[2.5px]' : ''}`} />
-                                    <span className={`text-[10px] font-medium transition-opacity ${isActive ? 'opacity-100' : 'opacity-80'}`}>{tab.label}</span>
+                                    <span
+                                        className={`flex h-9 w-9 items-center justify-center rounded-full transition-all duration-300 ${
+                                            isActive
+                                                ? 'bg-champagne text-white shadow-soft'
+                                                : 'text-[var(--muted-foreground)]'
+                                        }`}
+                                    >
+                                        <Icon size={18} />
+                                    </span>
+                                    <span
+                                        className={`text-[10px] transition-colors ${
+                                            isActive ? 'text-[var(--text-primary)]' : 'text-[var(--muted-foreground)]'
+                                        }`}
+                                    >
+                                        {tab.label}
+                                    </span>
                                 </button>
                             )
                         })}
@@ -38,26 +53,44 @@ export default function TabBar() {
                 </div>
             </nav>
 
-            <nav className="hidden lg:block fixed top-0 left-0 right-0 z-50 border-b border-zinc-200 dark:border-zinc-800 bg-white/85 dark:bg-zinc-950/85 backdrop-blur-md">
-                <div className="mx-auto w-full max-w-screen-2xl px-6 py-3">
-                    <div className="flex items-center gap-2">
-                        {tabs.map((tab) => {
-                            const Icon = tab.icon
-                            const isActive = location.pathname === tab.path
-                            return (
-                                <button
-                                    key={tab.path}
-                                    className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${isActive
-                                        ? 'bg-accent/10 text-accent'
-                                        : 'text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:text-zinc-100 dark:hover:bg-zinc-800'
-                                        }`}
-                                    onClick={() => navigate(tab.path)}
-                                >
-                                    <Icon size={16} className={isActive ? 'stroke-[2.4px]' : ''} />
-                                    <span>{tab.label}</span>
-                                </button>
-                            )
-                        })}
+            {/* Desktop top nav — glass + champagne logo + pill highlight */}
+            <nav className="hidden lg:block fixed top-0 left-0 right-0 z-50">
+                <div className="glass border-b border-[var(--border)]">
+                    <div className="mx-auto w-full max-w-screen-2xl px-6 py-4">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <span className="text-champagne">
+                                    <Sparkles size={18} />
+                                </span>
+                                <span className="font-serif text-lg tracking-wide">AIWardrobe</span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                                {tabs.map((tab) => {
+                                    const Icon = tab.icon
+                                    const isActive = location.pathname === tab.path
+                                    return (
+                                        <button
+                                            key={tab.path}
+                                            className={`relative rounded-full px-4 py-2 text-sm transition-colors duration-300 ${
+                                                isActive
+                                                    ? 'text-[var(--text-primary)]'
+                                                    : 'text-[var(--muted-foreground)] hover:text-[var(--text-primary)]'
+                                            }`}
+                                            onClick={() => navigate(tab.path)}
+                                        >
+                                            {isActive && (
+                                                <span className="absolute inset-0 rounded-full bg-[var(--secondary)]" />
+                                            )}
+                                            <span className="relative flex items-center gap-1.5">
+                                                <Icon size={16} />
+                                                {tab.label}
+                                            </span>
+                                        </button>
+                                    )
+                                })}
+                            </div>
+                            <div className="w-9" />
+                        </div>
                     </div>
                 </div>
             </nav>

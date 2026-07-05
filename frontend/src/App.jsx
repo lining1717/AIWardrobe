@@ -11,8 +11,24 @@ import './index.css'
 function App() {
   return (
     <Router>
-      <div className="min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)] relative">
-        <div className="mx-auto w-full max-w-screen-2xl pb-24 lg:pb-8 lg:pt-20 lg:px-6">
+      <div className="relative min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)] overflow-hidden">
+        {/* Soft decorative glows — warm rose / champagne / sage */}
+        <div className="pointer-events-none fixed inset-0 overflow-hidden">
+          <div
+            className="absolute -left-32 -top-24 h-96 w-96 rounded-full opacity-50 blur-3xl"
+            style={{ background: 'radial-gradient(circle, var(--accent-rose), transparent 70%)' }}
+          />
+          <div
+            className="absolute -right-40 top-1/3 h-[28rem] w-[28rem] rounded-full opacity-40 blur-3xl"
+            style={{ background: 'radial-gradient(circle, var(--accent-champagne), transparent 70%)' }}
+          />
+          <div
+            className="absolute bottom-0 left-1/4 h-80 w-80 rounded-full opacity-30 blur-3xl"
+            style={{ background: 'radial-gradient(circle, var(--accent-sage), transparent 70%)' }}
+          />
+        </div>
+
+        <div className="relative z-10 mx-auto w-full max-w-screen-2xl pb-24 lg:pb-8 lg:pt-20 lg:px-6">
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/entry" element={<Entry />} />

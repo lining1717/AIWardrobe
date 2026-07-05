@@ -353,14 +353,14 @@ const Settings = ({ isOpen, onClose, onSave }) => {
     if (!isOpen) return null
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-sm transition-opacity" onClick={onClose}>
+        <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-black/30 backdrop-blur-sm transition-opacity" onClick={onClose}>
             <div
-                className="bg-[var(--bg-primary)] w-full max-w-lg rounded-t-3xl sm:rounded-2xl max-h-[90vh] sm:max-h-[85vh] flex flex-col shadow-xl animate-[slideUp_0.3s_ease-out]"
+                className="bg-[var(--bg-primary)] w-full max-w-lg rounded-t-[1.75rem] sm:rounded-[1.75rem] max-h-[90vh] sm:max-h-[85vh] flex flex-col shadow-soft-lg animate-[slideUp_0.3s_ease-out] overflow-hidden"
                 onClick={e => e.stopPropagation()}
             >
-                <div className="flex items-center justify-between p-5 border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 sm:rounded-t-2xl px-6">
-                    <h2 className="text-xl font-serif font-bold text-zinc-900 dark:text-zinc-100 tracking-tight">{t('settings.title')}</h2>
-                    <button className="w-8 h-8 flex items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-500 hover:bg-zinc-200 dark:hover:bg-zinc-700 hover:text-zinc-800 dark:hover:text-zinc-200 transition-colors" onClick={onClose}>
+                <div className="flex items-center justify-between p-5 border-b border-[var(--border)] bg-[var(--bg-card)] px-6">
+                    <h2 className="text-xl font-serif font-bold text-[var(--text-primary)] tracking-tight">{t('settings.title')}</h2>
+                    <button className="w-9 h-9 flex items-center justify-center rounded-full bg-[var(--secondary)] text-[var(--muted-foreground)] hover:bg-[var(--accent-champagne)] hover:text-white transition-all duration-200 hover:-translate-y-0.5" onClick={onClose}>
                         ✕
                     </button>
                 </div>
@@ -368,22 +368,22 @@ const Settings = ({ isOpen, onClose, onSave }) => {
                 <div className="flex-1 overflow-y-auto p-6 space-y-8">
                     {/* App Settings Section */}
                     <div className="space-y-4">
-                        <div className="text-xs font-bold tracking-widest text-zinc-400 uppercase">{t('settings.appSection')}</div>
+                        <div className="text-[11px] font-semibold tracking-[0.22em] uppercase text-[var(--muted-foreground)]">{t('settings.appSection')}</div>
 
                         {/* Language Switcher */}
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300 flex items-center gap-1.5">
-                                <Globe size={16} className="text-accent" />
+                            <label className="text-sm font-medium text-[var(--text-secondary)] flex items-center gap-1.5">
+                                <Globe size={16} className="text-champagne" />
                                 {t('settings.language')}
                             </label>
                             <div className="flex gap-2">
                                 {LANGUAGES.map(lang => (
                                     <button
                                         key={lang.code}
-                                        className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all duration-200 ${
+                                        className={`flex-1 py-2 px-3 rounded-full text-sm font-medium transition-all duration-200 ${
                                             i18n.language === lang.code || (i18n.language.startsWith(lang.code))
-                                                ? 'bg-accent text-white shadow-sm'
-                                                : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-700'
+                                                ? 'bg-champagne text-white shadow-soft'
+                                                : 'bg-[var(--secondary)] text-[var(--text-secondary)] hover:opacity-80'
                                         }`}
                                         onClick={() => changeLanguage(lang.code)}
                                     >
@@ -395,16 +395,16 @@ const Settings = ({ isOpen, onClose, onSave }) => {
 
                         {/* Theme Switcher */}
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300 flex items-center gap-1.5">
-                                {theme === 'dark' ? <Moon size={16} className="text-accent" /> : <Sun size={16} className="text-accent" />}
+                            <label className="text-sm font-medium text-[var(--text-secondary)] flex items-center gap-1.5">
+                                {theme === 'dark' ? <Moon size={16} className="text-champagne" /> : <Sun size={16} className="text-champagne" />}
                                 {t('settings.theme')}
                             </label>
                             <div className="flex gap-2">
                                 <button
-                                    className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
+                                    className={`flex-1 py-2 px-3 rounded-full text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
                                         theme === 'light'
-                                            ? 'bg-accent text-white shadow-sm'
-                                            : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-700'
+                                            ? 'bg-champagne text-white shadow-soft'
+                                            : 'bg-[var(--secondary)] text-[var(--text-secondary)] hover:opacity-80'
                                     }`}
                                     onClick={() => theme !== 'light' && toggleTheme()}
                                 >
@@ -412,10 +412,10 @@ const Settings = ({ isOpen, onClose, onSave }) => {
                                     {t('settings.themeLight')}
                                 </button>
                                 <button
-                                    className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
+                                    className={`flex-1 py-2 px-3 rounded-full text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
                                         theme === 'dark'
-                                            ? 'bg-accent text-white shadow-sm'
-                                            : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-700'
+                                            ? 'bg-champagne text-white shadow-soft'
+                                            : 'bg-[var(--secondary)] text-[var(--text-secondary)] hover:opacity-80'
                                     }`}
                                     onClick={() => theme !== 'dark' && toggleTheme()}
                                 >
@@ -426,8 +426,8 @@ const Settings = ({ isOpen, onClose, onSave }) => {
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300 flex items-center gap-1.5">
-                                <Sparkles size={16} className="text-accent" />
+                            <label className="text-sm font-medium text-[var(--text-secondary)] flex items-center gap-1.5">
+                                <Sparkles size={16} className="text-champagne" />
                                 {t('settings.zodiac')}
                             </label>
                             <select
@@ -445,8 +445,8 @@ const Settings = ({ isOpen, onClose, onSave }) => {
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300 flex items-center gap-1.5">
-                                <MapPin size={16} className="text-accent" />
+                            <label className="text-sm font-medium text-[var(--text-secondary)] flex items-center gap-1.5">
+                                <MapPin size={16} className="text-champagne" />
                                 {t('settings.defaultCity')}
                             </label>
                             <div className="relative" ref={locationPickerRef}>
@@ -466,7 +466,7 @@ const Settings = ({ isOpen, onClose, onSave }) => {
                                 />
                                 <button
                                     type="button"
-                                    className="absolute right-2 top-1/2 -translate-y-1/2 h-7 w-7 rounded-md text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200"
+                                    className="absolute right-2 top-1/2 -translate-y-1/2 h-7 w-7 rounded-full text-[var(--muted-foreground)] hover:text-[var(--text-primary)] transition-colors"
                                     onClick={() => setShowLocationDropdown(open => !open)}
                                     aria-label={t('settings.defaultCity')}
                                 >
@@ -474,13 +474,13 @@ const Settings = ({ isOpen, onClose, onSave }) => {
                                 </button>
 
                                 {showLocationDropdown && (
-                                    <div className="absolute z-40 mt-1 w-full max-h-56 overflow-y-auto rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 shadow-lg">
+                                    <div className="absolute z-40 mt-1 w-full max-h-56 overflow-y-auto rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] shadow-soft-lg">
                                         {locationSuggestions.length > 0 ? (
                                             locationSuggestions.map(option => (
                                                 <button
                                                     key={option.value}
                                                     type="button"
-                                                    className="w-full text-left px-3 py-2.5 text-sm text-zinc-800 dark:text-zinc-200 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
+                                                    className="w-full text-left px-3 py-2.5 text-sm text-[var(--text-primary)] hover:bg-[var(--secondary)] transition-colors"
                                                     onMouseDown={(event) => {
                                                         event.preventDefault()
                                                         setConfig(prev => ({ ...prev, weather_location: option.value }))
@@ -494,9 +494,9 @@ const Settings = ({ isOpen, onClose, onSave }) => {
                                                 </button>
                                             ))
                                         ) : searchingLocations ? (
-                                            <div className="px-3 py-2.5 text-sm text-zinc-500">{t('recommendation.searching')}</div>
+                                            <div className="px-3 py-2.5 text-sm text-[var(--muted-foreground)]">{t('recommendation.searching')}</div>
                                         ) : (
-                                            <div className="px-3 py-2.5 text-sm text-zinc-500">{t('recommendation.noCity')}</div>
+                                            <div className="px-3 py-2.5 text-sm text-[var(--muted-foreground)]">{t('recommendation.noCity')}</div>
                                         )}
                                     </div>
                                 )}
@@ -504,16 +504,16 @@ const Settings = ({ isOpen, onClose, onSave }) => {
                         </div>
                     </div>
 
-                    <div className="h-px bg-zinc-200/60 dark:bg-zinc-700/60 w-full" />
+                    <div className="h-px bg-[var(--border)] w-full" />
 
                     {/* LLM Section */}
                     <div className="space-y-4">
-                        <div className="text-xs font-bold tracking-widest text-zinc-400 uppercase">{t('settings.llmSection')}</div>
+                        <div className="text-[11px] font-semibold tracking-[0.22em] uppercase text-[var(--muted-foreground)]">{t('settings.llmSection')}</div>
 
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300 flex justify-between">
+                            <label className="text-sm font-medium text-[var(--text-secondary)] flex justify-between">
                                 {t('settings.apiBaseLabel')}
-                                <span className="text-zinc-400 font-normal">{t('settings.apiBaseHint')}</span>
+                                <span className="text-[var(--muted-foreground)] font-normal">{t('settings.apiBaseHint')}</span>
                             </label>
                             <input
                                 type="url"
@@ -525,10 +525,10 @@ const Settings = ({ isOpen, onClose, onSave }) => {
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300 flex justify-between">
+                            <label className="text-sm font-medium text-[var(--text-secondary)] flex justify-between">
                                 {t('settings.apiKeyLabel')}
                                 {hasExistingKey && !config.api_key && (
-                                    <span className="text-green-500 font-normal text-xs bg-green-50 dark:bg-green-900/30 px-2 py-0.5 rounded">{t('settings.configured')}</span>
+                                    <span className="tag-sage font-normal text-[11px] px-2 py-0.5 rounded-full">{t('settings.configured')}</span>
                                 )}
                             </label>
                             <input
@@ -541,9 +541,9 @@ const Settings = ({ isOpen, onClose, onSave }) => {
                         </div>
 
                         <div className="space-y-2 relative">
-                            <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300 flex justify-between">
+                            <label className="text-sm font-medium text-[var(--text-secondary)] flex justify-between">
                                 {t('settings.model')}
-                                {loading && <span className="text-zinc-400 font-normal animate-pulse text-xs">{t('settings.fetching')}</span>}
+                                {loading && <span className="text-[var(--muted-foreground)] font-normal animate-pulse text-xs">{t('settings.fetching')}</span>}
                             </label>
                             <div className="flex gap-2 relative">
                                 {models.length > 0 && showModelSelect ? (
@@ -580,7 +580,7 @@ const Settings = ({ isOpen, onClose, onSave }) => {
                                         />
                                         {models.length > 0 && (
                                             <button
-                                                className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 rounded-md"
+                                                className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center text-[var(--muted-foreground)] hover:text-[var(--text-primary)] rounded-full transition-colors"
                                                 onClick={() => setShowModelSelect(true)}
                                                 title={t('settings.switchToList')}
                                             >
@@ -597,21 +597,21 @@ const Settings = ({ isOpen, onClose, onSave }) => {
 
                         <div className="pt-2">
                             <button
-                                className={`w-full py-2.5 rounded-lg border flex items-center justify-center gap-2 font-medium transition-colors ${
-                                    testResult?.success ? 'border-green-200 bg-green-50 dark:bg-green-900/30 dark:border-green-800 text-green-700 dark:text-green-400' :
-                                    testResult?.success === false ? 'border-red-200 bg-red-50 dark:bg-red-900/30 dark:border-red-800 text-red-700 dark:text-red-400' :
-                                    'border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-700 hover:border-zinc-300'
+                                className={`w-full py-2.5 rounded-full border flex items-center justify-center gap-2 font-medium transition-all duration-200 ${
+                                    testResult?.success ? 'border-[color-mix(in_srgb,var(--accent-sage)_35%,transparent)] bg-[color-mix(in_srgb,var(--accent-sage)_10%,transparent)] text-[#6f7d68]' :
+                                    testResult?.success === false ? 'border-[color-mix(in_srgb,var(--accent-clay)_35%,transparent)] bg-[color-mix(in_srgb,var(--accent-clay)_10%,transparent)] text-[var(--accent-clay)]' :
+                                    'border-[var(--border)] bg-[var(--secondary)] text-[var(--text-secondary)] hover:opacity-80'
                                 }`}
                                 onClick={handleTestConnection}
                                 disabled={testing}
                             >
-                                {testing ? <span className="w-4 h-4 border-2 border-zinc-400 border-t-zinc-600 rounded-full animate-spin"></span> : '🔗'}
+                                {testing ? <span className="w-4 h-4 border-2 border-[var(--border)] border-t-[var(--accent)] rounded-full animate-spin"></span> : '🔗'}
                                 {testing ? t('settings.testing') : testResult ? testResult.message : t('settings.testConnection')}
                             </button>
                         </div>
 
                         <div className="pt-2">
-                            <p className="text-xs text-zinc-500 mb-2 font-medium">{t('settings.presets')}</p>
+                            <p className="text-xs text-[var(--muted-foreground)] mb-2 font-medium">{t('settings.presets')}</p>
                             <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
                                 {[
                                     { name: 'OpenAI', base: 'https://api.openai.com/v1', model: 'gpt-4o' },
@@ -621,7 +621,7 @@ const Settings = ({ isOpen, onClose, onSave }) => {
                                 ].map(p => (
                                     <button
                                         key={p.name}
-                                        className="py-1.5 px-2 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-md text-xs font-medium text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-700 hover:text-zinc-900 dark:hover:text-zinc-200 transition-colors"
+                                        className="py-1.5 px-2 bg-[var(--bg-card)] border border-[var(--border)] rounded-full text-xs font-medium text-[var(--text-secondary)] hover:bg-[var(--secondary)] hover:text-[var(--text-primary)] hover:border-[var(--accent)]/40 transition-all duration-200"
                                         onClick={() => setConfig(prev => ({ ...prev, api_base: p.base, model: p.model }))}
                                     >
                                         {p.name}
@@ -631,10 +631,10 @@ const Settings = ({ isOpen, onClose, onSave }) => {
                         </div>
 
                         <div className="pt-2 space-y-3">
-                            <div className="text-xs font-bold tracking-widest text-zinc-400 uppercase">{t('settings.tryOnSection')}</div>
+                            <div className="text-[11px] font-semibold tracking-[0.22em] uppercase text-[var(--muted-foreground)]">{t('settings.tryOnSection')}</div>
 
                             <div className="space-y-2">
-                                <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">{t('settings.tryOnProvider')}</label>
+                                <label className="text-sm font-medium text-[var(--text-secondary)]">{t('settings.tryOnProvider')}</label>
                                 <select
                                     className="input-field appearance-none"
                                     value={config.tryon_provider}
@@ -648,7 +648,7 @@ const Settings = ({ isOpen, onClose, onSave }) => {
                             {config.tryon_provider === 'custom' && (
                                 <>
                                     <div className="space-y-2">
-                                        <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">{t('settings.tryOnApiUrl')}</label>
+                                        <label className="text-sm font-medium text-[var(--text-secondary)]">{t('settings.tryOnApiUrl')}</label>
                                         <input
                                             type="url"
                                             className="input-field"
@@ -659,10 +659,10 @@ const Settings = ({ isOpen, onClose, onSave }) => {
                                     </div>
 
                                     <div className="space-y-2">
-                                        <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300 flex justify-between">
+                                        <label className="text-sm font-medium text-[var(--text-secondary)] flex justify-between">
                                             {t('settings.tryOnApiKey')}
                                             {hasTryonApiKey && !config.tryon_api_key && (
-                                                <span className="text-green-500 font-normal text-xs bg-green-50 dark:bg-green-900/30 px-2 py-0.5 rounded">{t('settings.configured')}</span>
+                                                <span className="tag-sage font-normal text-[11px] px-2 py-0.5 rounded-full">{t('settings.configured')}</span>
                                             )}
                                         </label>
                                         <input
@@ -675,7 +675,7 @@ const Settings = ({ isOpen, onClose, onSave }) => {
                                     </div>
 
                                     <div className="space-y-2">
-                                        <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">{t('settings.tryOnModel')}</label>
+                                        <label className="text-sm font-medium text-[var(--text-secondary)]">{t('settings.tryOnModel')}</label>
                                         <input
                                             type="text"
                                             className="input-field"
@@ -689,26 +689,26 @@ const Settings = ({ isOpen, onClose, onSave }) => {
                         </div>
                     </div>
 
-                    <div className="h-px bg-zinc-200/60 dark:bg-zinc-700/60 w-full" />
+                    <div className="h-px bg-[var(--border)] w-full" />
 
                     {/* Image Processing Section */}
                     <div className="space-y-4">
-                        <div className="text-xs font-bold tracking-widest text-zinc-400 uppercase">{t('settings.imageSection')}</div>
+                        <div className="text-[11px] font-semibold tracking-[0.22em] uppercase text-[var(--muted-foreground)]">{t('settings.imageSection')}</div>
 
                         <div className="flex flex-col gap-3">
-                            <label className={`flex gap-3 p-3 rounded-xl border-2 transition-colors cursor-pointer ${config.bg_removal_method === 'local' ? 'border-accent bg-blue-50/20 dark:bg-blue-950/20' : 'border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 hover:border-zinc-300 dark:hover:border-zinc-600'}`}>
+                            <label className={`flex gap-3 p-4 rounded-2xl border-2 transition-all duration-200 cursor-pointer ${config.bg_removal_method === 'local' ? 'border-[var(--accent)] bg-[color-mix(in_srgb,var(--accent-champagne)_8%,transparent)] shadow-soft' : 'border-[var(--border)] bg-[var(--bg-card)] hover:border-[var(--accent)]/40'}`}>
                                 <input
                                     type="radio"
                                     name="bg_removal_method"
                                     value="local"
-                                    className="mt-1"
+                                    className="mt-1 accent-[var(--accent)]"
                                     checked={config.bg_removal_method === 'local'}
                                     onChange={e => setConfig(prev => ({ ...prev, bg_removal_method: e.target.value }))}
                                 />
                                 <div className="flex flex-col">
-                                    <span className="font-medium text-zinc-900 dark:text-zinc-100 text-sm">{t('settings.localRembg')}</span>
-                                    <span className="text-xs text-zinc-500 mt-0.5">{t('settings.localRembgDesc')}</span>
-                                    <span className="text-[11px] text-zinc-500 mt-1">{t('settings.localRembgOptional')}</span>
+                                    <span className="font-medium text-[var(--text-primary)] text-sm">{t('settings.localRembg')}</span>
+                                    <span className="text-xs text-[var(--muted-foreground)] mt-0.5">{t('settings.localRembgDesc')}</span>
+                                    <span className="text-[11px] text-[var(--muted-foreground)] mt-1">{t('settings.localRembgOptional')}</span>
                                     <div className="mt-2 flex items-center gap-2">
                                         <button
                                             type="button"
@@ -718,36 +718,36 @@ const Settings = ({ isOpen, onClose, onSave }) => {
                                         >
                                             {installingRembg ? t('settings.installingRembg') : t('settings.installRembg')}
                                         </button>
-                                        <code className="inline-block rounded bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 text-[11px] text-zinc-700 dark:text-zinc-200">{t('settings.localRembgInstall')}</code>
+                                        <code className="inline-block rounded-full bg-[var(--secondary)] px-2 py-0.5 text-[11px] text-[var(--text-secondary)]">{t('settings.localRembgInstall')}</code>
                                     </div>
                                 </div>
                             </label>
 
-                            <label className={`flex gap-3 p-3 rounded-xl border-2 transition-colors cursor-pointer ${config.bg_removal_method === 'removebg' ? 'border-accent bg-blue-50/20 dark:bg-blue-950/20' : 'border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 hover:border-zinc-300 dark:hover:border-zinc-600'}`}>
+                            <label className={`flex gap-3 p-4 rounded-2xl border-2 transition-all duration-200 cursor-pointer ${config.bg_removal_method === 'removebg' ? 'border-[var(--accent)] bg-[color-mix(in_srgb,var(--accent-champagne)_8%,transparent)] shadow-soft' : 'border-[var(--border)] bg-[var(--bg-card)] hover:border-[var(--accent)]/40'}`}>
                                 <input
                                     type="radio"
                                     name="bg_removal_method"
                                     value="removebg"
-                                    className="mt-1"
+                                    className="mt-1 accent-[var(--accent)]"
                                     checked={config.bg_removal_method === 'removebg'}
                                     onChange={e => setConfig(prev => ({ ...prev, bg_removal_method: e.target.value }))}
                                 />
                                 <div className="flex flex-col">
-                                    <span className="font-medium text-zinc-900 dark:text-zinc-100 text-sm flex items-center gap-2">
+                                    <span className="font-medium text-[var(--text-primary)] text-sm flex items-center gap-2">
                                         remove.bg API
-                                        <span className="px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-500 text-[10px] font-bold">PRO</span>
+                                        <span className="px-1.5 py-0.5 rounded-full tag-clay text-[10px] font-bold">PRO</span>
                                     </span>
-                                    <span className="text-xs text-zinc-500 mt-0.5">{t('settings.removebgDesc')}</span>
+                                    <span className="text-xs text-[var(--muted-foreground)] mt-0.5">{t('settings.removebgDesc')}</span>
                                 </div>
                             </label>
                         </div>
 
                         {config.bg_removal_method === 'removebg' && (
                             <div className="animate-fade-in space-y-2 mt-4">
-                                <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300 flex justify-between">
+                                <label className="text-sm font-medium text-[var(--text-secondary)] flex justify-between">
                                     remove.bg API Key
                                     {hasRemoveBgKey && !config.removebg_api_key && (
-                                        <span className="text-green-500 font-normal text-xs bg-green-50 dark:bg-green-900/30 px-2 py-0.5 rounded">{t('settings.configured')}</span>
+                                        <span className="tag-sage font-normal text-[11px] px-2 py-0.5 rounded-full">{t('settings.configured')}</span>
                                     )}
                                 </label>
                                 <input
@@ -758,7 +758,7 @@ const Settings = ({ isOpen, onClose, onSave }) => {
                                     placeholder={hasRemoveBgKey ? `••••••••（${t('settings.keepEmpty')}）` : t('settings.removebgKeyPlaceholder')}
                                 />
                                 <div className="text-xs flex justify-end">
-                                    <a href="https://www.remove.bg/api" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">
+                                    <a href="https://www.remove.bg/api" target="_blank" rel="noopener noreferrer" className="text-champagne hover:underline">
                                         {t('settings.getKey')}
                                     </a>
                                 </div>
@@ -769,11 +769,11 @@ const Settings = ({ isOpen, onClose, onSave }) => {
                     <div className="pb-4" />
                 </div>
 
-                <div className="p-5 border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 sm:rounded-b-2xl flex gap-3 pb-safe">
-                    <button className="flex-1 py-3 rounded-xl font-medium bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors" onClick={onClose}>
+                <div className="p-5 border-t border-[var(--border)] bg-[var(--bg-card)] flex gap-3 pb-safe">
+                    <button className="flex-1 py-3 rounded-full font-medium bg-[var(--secondary)] text-[var(--text-secondary)] hover:opacity-80 transition-all duration-200" onClick={onClose}>
                         {t('settings.cancel')}
                     </button>
-                    <button className="flex-[2] py-3 rounded-xl font-medium bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 shadow-sm hover:bg-black dark:hover:bg-white transition-colors" onClick={() => handleSave(true)}>
+                    <button className="flex-[2] py-3 rounded-full font-medium bg-champagne text-white shadow-soft-lg hover:-translate-y-0.5 transition-all duration-200" onClick={() => handleSave(true)}>
                         {t('settings.saveSettings')}
                     </button>
                 </div>

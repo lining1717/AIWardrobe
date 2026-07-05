@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
-import { Sparkles, RefreshCw, Mic, MicOff } from 'lucide-react'
+import { Sparkles, RefreshCw, Mic, MicOff, MapPin, RotateCcw, ShoppingBag, Check } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 import { useRecommendation } from '../contexts/RecommendationContext'
 
@@ -188,314 +188,341 @@ export default function Recommendation() {
         }
         const reasonText = reason || t('recommendation.reasonFallback')
         return (
-            <div className="card group overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                <div className="px-3 py-2 border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800">
-                    <span className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">{label}</span>
+            <div className="overflow-hidden rounded-[1.5rem] bg-[var(--bg-card)] shadow-soft transition-all duration-300 hover:-translate-y-1">
+                <div className="px-4 py-2 border-b border-[var(--border)] bg-[var(--secondary)]/50">
+                    <span className="text-[11px] font-semibold text-[var(--muted-foreground)] uppercase tracking-[0.18em]">{label}</span>
                 </div>
-                <div className="aspect-square bg-zinc-100/50 dark:bg-zinc-800/50 p-4 border-b border-zinc-100 dark:border-zinc-800 relative overflow-hidden">
+                <div className="aspect-square bg-[var(--secondary)]/40 p-4 border-b border-[var(--border)] relative overflow-hidden">
                     {item.image_url ? (
                         <img
                             src={toImageUrl(item.image_url)}
                             alt={item.item}
-                            className="w-full h-full object-contain filter drop-shadow-sm group-hover:scale-105 transition-transform duration-500"
+                            className="w-full h-full object-contain drop-shadow-sm"
                         />
                     ) : (
-                        <div className="w-full h-full rounded-lg bg-zinc-100 dark:bg-zinc-800" />
+                        <div className="w-full h-full rounded-2xl bg-[var(--secondary)]" />
                     )}
                 </div>
-                <div className="p-3">
-                    <div className="text-sm font-medium text-zinc-900 dark:text-zinc-100 truncate">{item.item}</div>
+                <div className="p-4">
+                    <div className="text-sm font-medium text-[var(--text-primary)] truncate">{item.item}</div>
                     {item.description && (
-                        <div className="text-xs text-zinc-400 mt-0.5 line-clamp-1">{item.description}</div>
+                        <div className="text-xs text-[var(--muted-foreground)] mt-0.5 line-clamp-1">{item.description}</div>
                     )}
-                    <div className="text-xs text-zinc-500 mt-2 leading-relaxed">{reasonText}</div>
+                    <div className="text-xs text-[var(--muted-foreground)] mt-2 leading-relaxed">{reasonText}</div>
                 </div>
             </div>
         )
     }
 
+    const modes = [
+        { key: 'balanced', label: t('recommendation.mode.balanced'), desc: t('recommendation.modeHint.balanced') },
+        { key: 'goal_first', label: t('recommendation.mode.goal_first'), desc: t('recommendation.modeHint.goal_first') },
+        { key: 'wardrobe_first', label: t('recommendation.mode.wardrobe_first'), desc: t('recommendation.modeHint.wardrobe_first') }
+    ]
+
     return (
-        <div className="min-h-screen bg-[var(--bg-primary)] flex flex-col pt-safe pb-24 relative overflow-hidden">
-            <div className="absolute top-[-10%] right-[-10%] w-96 h-96 bg-blue-100 dark:bg-blue-900/30 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-3xl opacity-30 pointer-events-none"></div>
-            <div className="absolute bottom-[20%] left-[-10%] w-72 h-72 bg-purple-100 dark:bg-purple-900/30 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-3xl opacity-30 pointer-events-none"></div>
-
+        <div className="flex flex-col pt-8 pb-28 md:pb-12 relative max-w-5xl mx-auto w-full px-5 md:px-8">
             {!weather && !loading && (
-                <div className="flex-1 flex flex-col items-center justify-center p-8 z-10 text-center animate-fade-in -mt-8">
-                    <div className="w-20 h-20 bg-accent/10 rounded-full flex items-center justify-center text-accent mb-6 shadow-[0_0_40px_rgba(37,99,235,0.2)]">
-                        <Sparkles size={36} />
+                <div className="flex-1 flex flex-col items-center justify-center py-12 text-center animate-fade-in">
+                    <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--accent-champagne)_20%,transparent)] text-champagne">
+                        <Sparkles size={28} />
                     </div>
-                    <h2 className="text-2xl font-serif font-bold text-zinc-900 dark:text-zinc-100 mb-3 tracking-tight leading-tight">{t('recommendation.getTitle')}<br />{t('recommendation.getSubtitle')}</h2>
-                    <p className="text-zinc-500 text-sm mb-8 leading-relaxed max-w-[260px] mx-auto">{t('recommendation.description')}</p>
-                    <div className="w-full max-w-xs space-y-3 mb-4 text-left">
-                        <label className="block text-xs font-semibold text-zinc-500 uppercase tracking-wide">
-                            {t('recommendation.modeLabel')}
-                        </label>
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                            {['balanced', 'goal_first', 'wardrobe_first'].map((option) => (
-                                <button
-                                    key={option}
-                                    type="button"
-                                    className={`px-2 py-2 rounded-lg text-xs border transition-colors ${
-                                        selectedMode === option
-                                            ? 'border-accent bg-accent/10 text-accent'
-                                            : 'border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-300'
-                                    }`}
-                                    disabled={loading}
-                                    onClick={() => setSelectedMode(option)}
-                                >
-                                    {t(`recommendation.mode.${option}`)}
-                                </button>
-                            ))}
-                        </div>
-                        <div className="text-[11px] text-zinc-500 leading-relaxed">
-                            {t(`recommendation.modeHint.${selectedMode}`)}
-                        </div>
-                        <label className="block text-xs font-semibold text-zinc-500 uppercase tracking-wide">
-                            {t('recommendation.goalLabel')}
-                        </label>
-                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-                            <input
-                                className="input flex-1"
-                                value={goalInput}
-                                onChange={(event) => setGoalInput(event.target.value)}
-                                placeholder={t('recommendation.goalPlaceholder')}
-                            />
-                            <button
-                                type="button"
-                                className="btn-secondary px-3 w-full sm:w-auto justify-center"
-                                onClick={toggleListening}
-                                disabled={!speechSupported || loading}
-                                title={speechSupported
-                                    ? (isListening ? t('recommendation.voiceStop') : t('recommendation.voiceStart'))
-                                    : t('recommendation.voiceUnsupported')}
-                            >
-                                {isListening ? <MicOff size={16} /> : <Mic size={16} />}
-                            </button>
-                        </div>
-                        <div className="text-[11px] text-zinc-500 leading-relaxed">
-                            {!speechSupported
-                                ? t('recommendation.voiceUnsupported')
-                                : loading
-                                    ? t('recommendation.voiceBusy')
-                                    : (isListening ? t('recommendation.voiceListening') : t('recommendation.goalHint'))}
-                        </div>
-                        {speechError && (
-                            <div className="text-[11px] text-red-600 dark:text-red-300 leading-relaxed">
-                                {speechError}
-                            </div>
-                        )}
-                    </div>
+                    <h1 className="font-serif text-3xl mb-2">{t('recommendation.getTitle')}</h1>
+                    <p className="text-[var(--muted-foreground)] text-sm mb-8 leading-relaxed max-w-sm">{t('recommendation.description')}</p>
 
-                    <button
-                        className="btn-primary w-full max-w-xs shadow-lg shadow-blue-500/30 hover:shadow-blue-500/40 py-3.5 rounded-xl border-none focus:ring-blue-500/50 disabled:opacity-60"
-                        onClick={generateRecommendation}
-                        disabled={loading}
-                    >
-                        <Sparkles size={18} className="animate-pulse" />
-                        <span className="font-semibold tracking-wide">{t('recommendation.generate')}</span>
-                    </button>
-                    <div className="mt-6">
-                        <span className="text-xs text-zinc-400 font-medium tracking-wide uppercase">{t('recommendation.currentLocation')}: {selectedCity.name}</span>
+                    <div className="w-full max-w-md space-y-4 text-left">
+                        <div>
+                            <label className="block text-[11px] font-semibold text-[var(--muted-foreground)] uppercase tracking-[0.18em] mb-2">
+                                {t('recommendation.modeLabel')}
+                            </label>
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                                {modes.map((option) => (
+                                    <button
+                                        key={option.key}
+                                        type="button"
+                                        className={`rounded-[1.25rem] border p-4 text-left transition-all duration-300 ${
+                                            selectedMode === option.key
+                                                ? 'border-[var(--accent)]/50 bg-[var(--bg-card)] shadow-soft'
+                                                : 'border-[var(--border)] bg-[var(--bg-card)]/50 hover:border-[var(--accent)]/30'
+                                        }`}
+                                        disabled={loading}
+                                        onClick={() => setSelectedMode(option.key)}
+                                    >
+                                        <div className="flex items-center justify-between mb-1">
+                                            <span className="text-sm text-[var(--text-primary)]">{option.label}</span>
+                                            {selectedMode === option.key && <Check className="h-3.5 w-3.5 text-champagne" />}
+                                        </div>
+                                        <p className="text-xs text-[var(--muted-foreground)] leading-relaxed">{option.desc}</p>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div>
+                            <label className="block text-[11px] font-semibold text-[var(--muted-foreground)] uppercase tracking-[0.18em] mb-2">
+                                {t('recommendation.goalLabel')}
+                            </label>
+                            <div className="relative">
+                                <input
+                                    className="w-full rounded-full border border-[var(--border)] bg-[var(--input-background)] py-3 pl-5 pr-14 outline-none focus:border-[var(--accent)]/50 text-sm text-[var(--text-primary)] placeholder:text-[var(--muted-foreground)]"
+                                    value={goalInput}
+                                    onChange={(event) => setGoalInput(event.target.value)}
+                                    placeholder={t('recommendation.goalPlaceholder')}
+                                />
+                                <button
+                                    type="button"
+                                    className="absolute right-2 top-1/2 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full bg-[var(--secondary)] text-champagne hover:opacity-80 transition-opacity"
+                                    onClick={toggleListening}
+                                    disabled={!speechSupported || loading}
+                                    title={speechSupported
+                                        ? (isListening ? t('recommendation.voiceStop') : t('recommendation.voiceStart'))
+                                        : t('recommendation.voiceUnsupported')}
+                                >
+                                    {isListening ? <MicOff size={16} /> : <Mic size={16} />}
+                                </button>
+                            </div>
+                            <div className="mt-2 text-[11px] text-[var(--muted-foreground)] leading-relaxed">
+                                {!speechSupported
+                                    ? t('recommendation.voiceUnsupported')
+                                    : loading
+                                        ? t('recommendation.voiceBusy')
+                                        : (isListening ? t('recommendation.voiceListening') : t('recommendation.goalHint'))}
+                            </div>
+                            {speechError && (
+                                <div className="mt-1 text-[11px] text-clay leading-relaxed">
+                                    {speechError}
+                                </div>
+                            )}
+                        </div>
+
+                        <button
+                            className="flex w-full items-center justify-center gap-2 rounded-full bg-champagne py-3.5 text-white shadow-soft-lg transition-transform hover:-translate-y-0.5 disabled:opacity-60"
+                            onClick={generateRecommendation}
+                            disabled={loading}
+                        >
+                            <Sparkles size={18} />
+                            <span className="font-medium tracking-wide">{t('recommendation.generate')}</span>
+                        </button>
+
+                        <div className="flex items-center justify-center gap-1.5 text-xs text-[var(--muted-foreground)]">
+                            <MapPin className="h-3 w-3" />
+                            {t('recommendation.currentLocation')}: {selectedCity.name}
+                        </div>
                     </div>
                 </div>
             )}
 
             {loading && (
-                <div className="flex-1 flex flex-col items-center justify-center p-8 z-10">
-                    <div className="w-16 h-16 relative flex items-center justify-center mb-6">
-                        <div className="absolute inset-0 border-4 border-zinc-100 dark:border-zinc-800 rounded-full"></div>
-                        <div className="absolute inset-0 border-4 border-accent border-t-transparent rounded-full animate-spin"></div>
-                        <Sparkles className="text-accent animate-pulse" size={20} />
+                <div className="flex-1 flex flex-col items-center justify-center py-24">
+                    <div className="relative mb-6 h-16 w-16">
+                        <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-champagne animate-spin" />
+                        <div className="absolute inset-2 rounded-full border-2 border-transparent border-b-[var(--accent-rose)] animate-spin" style={{ animationDirection: 'reverse' }} />
+                        <div className="absolute inset-0 flex items-center justify-center">
+                            <Sparkles className="h-5 w-5 animate-pulse text-champagne" />
+                        </div>
                     </div>
-                    <span className="text-zinc-500 text-sm font-medium tracking-wider animate-pulse">{t('recommendation.aiLoading')}</span>
+                    <h2 className="font-serif text-lg">{t('recommendation.aiLoading')}</h2>
+                    <p className="mt-1 text-sm text-[var(--muted-foreground)]">{t('recommendation.description')}</p>
                 </div>
             )}
 
             {!loading && weather && (
-                <div className="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 z-10 space-y-6 max-w-6xl mx-auto w-full">
+                <div className="flex-1 space-y-5 animate-fade-in">
+                    {/* Page header */}
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <p className="mb-1 text-[11px] uppercase tracking-[0.22em] text-[var(--muted-foreground)]">Your look today</p>
+                            <h1 className="font-serif text-3xl">{t('recommendation.title')}</h1>
+                        </div>
+                        <button
+                            className="flex items-center gap-1.5 rounded-full bg-[var(--bg-card)] px-4 py-2 text-sm shadow-soft hover:-translate-y-0.5 transition-all cursor-pointer"
+                            onClick={refreshRecommendation}
+                            title={t('recommendation.regenerate')}
+                        >
+                            <RotateCcw className="h-3.5 w-3.5" />
+                            {t('recommendation.regenerate')}
+                        </button>
+                    </div>
+
                     {error && (
-                        <div className="bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-900/40 rounded-2xl p-3 text-xs text-red-700 dark:text-red-200">
+                        <div className="rounded-[1.5rem] border border-[color-mix(in_srgb,var(--accent-clay)_30%,transparent)] bg-[color-mix(in_srgb,var(--accent-clay)_8%,var(--bg-card))] p-4 text-xs text-clay">
                             {error}
                         </div>
                     )}
-                    <div className="bg-gradient-to-br from-blue-500 to-accent text-white p-6 rounded-3xl shadow-lg relative overflow-hidden group">
-                        <div className="absolute -right-4 -top-8 text-8xl opacity-10 blur-sm mix-blend-overlay group-hover:scale-110 transition-transform duration-700 pointer-events-none">
+
+                    {/* Weather hero — champagne→rose gradient */}
+                    <div
+                        className="relative overflow-hidden rounded-[1.75rem] p-6 text-white shadow-soft-lg"
+                        style={{ background: 'linear-gradient(135deg, #b99872, #d9a7a2)' }}
+                    >
+                        <div className="absolute -right-6 -top-10 select-none text-[10rem] leading-none opacity-20" aria-hidden>
                             {getWeatherIcon(weather.icon)}
                         </div>
-                        <div className="relative z-10 flex items-start flex-col">
-                            <div className="flex items-end gap-3 mb-6">
-                                <span className="text-5xl font-light tracking-tighter">{Math.round(weather.temperature)}°</span>
-                                <div className="flex flex-col pb-1">
-                                    <span className="text-lg font-bold">{weather.condition}</span>
-                                    <span className="text-xs text-blue-100">{t('recommendation.feelsLike')} {Math.round(weather.feelsLike)}°</span>
-                                </div>
+                        <div className="relative">
+                            <div className="flex items-center gap-1.5 text-white/85">
+                                <MapPin className="h-3.5 w-3.5" /> {weather.location || selectedCity.name} · {weather.condition}
                             </div>
-                            <div className="flex gap-6 pt-4 border-t border-white/20">
-                                <div className="flex flex-col">
-                                    <span className="text-[10px] text-blue-100 uppercase tracking-widest font-bold">{t('recommendation.humidity')}</span>
-                                    <span className="text-sm font-semibold">{weather.humidity}%</span>
-                                </div>
-                                <div className="flex flex-col">
-                                    <span className="text-[10px] text-blue-100 uppercase tracking-widest font-bold">{t('recommendation.wind')}</span>
-                                    <span className="text-sm font-semibold">{weather.windScale}{t('recommendation.windLevel')}</span>
-                                </div>
+                            <div className="mt-2 font-serif text-6xl leading-none">{Math.round(weather.temperature)}°</div>
+                            <div className="mt-4 flex gap-6 text-sm text-white/85">
+                                <span>{t('recommendation.feelsLike')} {Math.round(weather.feelsLike)}°</span>
+                                <span>{t('recommendation.humidity')} {weather.humidity}%</span>
+                                <span>{t('recommendation.wind')} {weather.windScale}{t('recommendation.windLevel')}</span>
                             </div>
                         </div>
                     </div>
 
+                    {/* Horoscope grid */}
                     {horoscope && (
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                            <div className="bg-white dark:bg-zinc-900 p-4 rounded-2xl border border-zinc-200 dark:border-zinc-800">
-                                <div className="text-xs text-zinc-400">{t('recommendation.horoscopeSign')}</div>
-                                <div className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 mt-1">{horoscope.zodiac_name || t('home.unknownZodiac')}</div>
-                            </div>
-                            <div className="bg-white dark:bg-zinc-900 p-4 rounded-2xl border border-zinc-200 dark:border-zinc-800">
-                                <div className="text-xs text-zinc-400">{t('recommendation.mood')}</div>
-                                <div className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 mt-1">{horoscope.mood}</div>
-                            </div>
-                            <div className="bg-white dark:bg-zinc-900 p-4 rounded-2xl border border-zinc-200 dark:border-zinc-800">
-                                <div className="text-xs text-zinc-400">{t('recommendation.luckyColor')}</div>
-                                <div className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 mt-1">{horoscope.lucky_color}</div>
-                            </div>
-                            <div className="bg-white dark:bg-zinc-900 p-4 rounded-2xl border border-zinc-200 dark:border-zinc-800">
-                                <div className="text-xs text-zinc-400">{t('recommendation.luckyNumber')}</div>
-                                <div className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 mt-1">{horoscope.lucky_number}</div>
-                            </div>
-                            <div className="col-span-2 sm:col-span-4 bg-white dark:bg-zinc-900 p-4 rounded-2xl border border-zinc-200 dark:border-zinc-800">
-                                <div className="text-xs text-zinc-400">{t('recommendation.horoscopeSummary')}</div>
-                                <div className="text-sm text-zinc-700 dark:text-zinc-300 mt-1 leading-relaxed">{horoscope.summary}</div>
+                            <HoroscopeStat label={t('recommendation.horoscopeSign')} value={horoscope.zodiac_name || t('home.unknownZodiac')} />
+                            <HoroscopeStat label={t('recommendation.mood')} value={horoscope.mood} />
+                            <HoroscopeStat label={t('recommendation.luckyColor')} value={horoscope.lucky_color} />
+                            <HoroscopeStat label={t('recommendation.luckyNumber')} value={horoscope.lucky_number} />
+                            <div className="col-span-2 sm:col-span-4 rounded-[1.5rem] bg-[var(--bg-card)] p-4 shadow-soft">
+                                <p className="mb-1 text-xs text-[var(--muted-foreground)]">{t('recommendation.horoscopeSummary')}</p>
+                                <p className="text-sm text-[var(--text-secondary)] leading-relaxed">{horoscope.summary}</p>
                             </div>
                         </div>
                     )}
 
-                    {(goalRaw || goalNormalized) && (
-                        <div className="bg-white dark:bg-zinc-900 p-4 rounded-2xl border border-zinc-200 dark:border-zinc-800">
-                            <div className="text-xs text-zinc-400 mb-1">{t('recommendation.goalUsed')}</div>
-                            <div className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-                                {goalRaw || goalNormalized}
+                    {/* Goal + temperature rule */}
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                        {temperatureRule && (
+                            <div className="rounded-[1.5rem] bg-[var(--bg-card)] p-5 shadow-soft">
+                                <p className="mb-1 text-[11px] uppercase tracking-[0.18em] text-[var(--muted-foreground)]">{t('recommendation.temperatureRule')}</p>
+                                <p className="text-[var(--text-primary)]">{temperatureRule.label}</p>
+                                <p className="mt-1 text-sm text-[var(--muted-foreground)]">{temperatureRule.advice}</p>
+                                {temperatureRule.allowed_seasons?.length > 0 && (
+                                    <p className="mt-2 text-xs text-[var(--muted-foreground)]">{t('recommendation.allowedSeasons')}: {temperatureRule.allowed_seasons.join(' / ')}</p>
+                                )}
                             </div>
-                        </div>
-                    )}
+                        )}
+                        {(goalRaw || goalNormalized) && (
+                            <div className="rounded-[1.5rem] bg-[var(--bg-card)] p-5 shadow-soft">
+                                <p className="mb-1 text-[11px] uppercase tracking-[0.18em] text-[var(--muted-foreground)]">{t('recommendation.goalUsed')}</p>
+                                <p className="text-[var(--text-primary)]">{goalRaw || goalNormalized}</p>
+                                <p className="mt-1 text-sm text-[var(--muted-foreground)]">{modes.find(m => m.key === selectedMode)?.label}</p>
+                            </div>
+                        )}
+                    </div>
 
-                    {temperatureRule && (
-                        <div className="bg-white dark:bg-zinc-900 p-4 rounded-2xl border border-zinc-200 dark:border-zinc-800">
-                            <div className="text-xs text-zinc-400 mb-1">{t('recommendation.temperatureRule')}</div>
-                            <div className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{temperatureRule.label}</div>
-                            <div className="text-xs text-zinc-500 mt-2">{temperatureRule.advice}</div>
-                            {temperatureRule.allowed_seasons?.length > 0 && (
-                                <div className="text-xs text-zinc-500 mt-2">{t('recommendation.allowedSeasons')}: {temperatureRule.allowed_seasons.join(' / ')}</div>
-                            )}
-                        </div>
-                    )}
-
-                    <div className="space-y-4">
-                        <div className="flex items-center justify-between pl-1">
+                    {/* AI text with typewriter */}
+                    <div>
+                        <div className="flex items-center justify-between pl-1 mb-3">
                             <div className="flex items-center gap-2">
-                                <Sparkles size={18} className="text-accent" />
-                                <h3 className="font-serif font-bold text-zinc-900 dark:text-zinc-100 tracking-tight text-lg">{t('recommendation.aiTitle')}</h3>
+                                <Sparkles size={18} className="text-champagne" />
+                                <h3 className="font-serif text-lg">{t('recommendation.aiTitle')}</h3>
                             </div>
-                            <button className="text-zinc-400 hover:text-accent hover:rotate-180 transition-all duration-500 p-2" onClick={refreshRecommendation} title={t('recommendation.regenerate')}>
-                                <RefreshCw size={16} />
-                            </button>
                         </div>
-
-                        <div className="bg-white dark:bg-zinc-900 p-6 rounded-3xl shadow-sm border border-zinc-200 dark:border-zinc-800">
-                            <div className="prose prose-sm prose-zinc dark:prose-invert max-w-none text-zinc-600 dark:text-zinc-400 leading-relaxed font-serif tracking-wide">
+                        <div className="rounded-[1.75rem] bg-[var(--bg-card)] p-6 shadow-soft">
+                            <div className="prose prose-sm max-w-none text-[var(--text-secondary)] leading-relaxed font-serif tracking-wide">
                                 <ReactMarkdown>{displayedRecommendation}</ReactMarkdown>
                                 {displayedRecommendation.length < recommendation.length && (
-                                    <span className="inline-block w-1.5 h-4 ml-1 bg-accent/70 animate-pulse align-middle"></span>
+                                    <span className="inline-block w-1.5 h-4 ml-1 bg-champagne/70 animate-pulse align-middle rounded-sm" />
                                 )}
                             </div>
                         </div>
                     </div>
 
                     {outfitSummary && (
-                        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-900/40 rounded-2xl p-4 text-sm text-blue-700 dark:text-blue-200">
-                            <span className="font-semibold">{t('recommendation.outfitSummary')}:</span> {outfitSummary}
+                        <div className="rounded-[1.5rem] bg-[color-mix(in_srgb,var(--accent-champagne)_10%,transparent)] border border-[color-mix(in_srgb,var(--accent-champagne)_25%,transparent)] p-4 text-sm text-[var(--text-primary)]">
+                            <span className="font-semibold text-champagne">{t('recommendation.outfitSummary')}:</span> {outfitSummary}
                         </div>
                     )}
 
+                    {/* Suggested combo */}
                     {(suggestedTop || suggestedBottom || suggestedShoes) && (
-                        <div className="space-y-4 pt-2">
-                            <h3 className="font-serif font-bold text-zinc-900 dark:text-zinc-100 tracking-tight text-lg pl-1">{t('recommendation.suggestedCombo')}</h3>
+                        <div className="space-y-4 pt-1">
+                            <h3 className="font-serif text-lg pl-1">{t('recommendation.suggestedCombo')}</h3>
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
                                 {renderClothingCard(suggestedTop, t('recommendation.topWear'), selectionReasons?.top)}
                                 {renderClothingCard(suggestedBottom, t('recommendation.bottomWear'), selectionReasons?.bottom)}
                                 {renderClothingCard(suggestedShoes, t('recommendation.shoesWear'), selectionReasons?.shoes)}
                             </div>
-
-                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                                <button className="btn-secondary" onClick={refreshRecommendation}>
-                                    <RefreshCw size={15} />
-                                    {t('recommendation.regenerate')}
-                                </button>
-                                <button className="btn-secondary" onClick={() => navigate('/outfit')}>
-                                    <Sparkles size={15} />
-                                    {t('recommendation.goOutfit')}
-                                </button>
-                                <button className="btn-secondary" onClick={() => navigate('/wardrobe')}>
-                                    <Sparkles size={15} />
-                                    {t('recommendation.goWardrobe')}
-                                </button>
-                            </div>
                         </div>
                     )}
 
+                    {/* Accessories */}
                     {suggestedAccessories.length > 0 && (
-                        <div className="space-y-3">
-                            <h3 className="font-serif font-bold text-zinc-900 dark:text-zinc-100 tracking-tight text-lg pl-1">{t('recommendation.accessories')}</h3>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                                {suggestedAccessories.map((accessory, index) => (
-                                    <div key={`${accessory.name}-${index}`} className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-4">
-                                        <div className="flex items-start justify-between gap-3">
-                                            <div>
-                                                <div className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{accessory.name}</div>
-                                                <div className="text-xs text-zinc-500 mt-1 leading-relaxed">{accessory.reason}</div>
-                                            </div>
-                                            <span className={`text-[10px] px-2 py-1 rounded-full whitespace-nowrap ${
-                                                accessory.from_wardrobe
-                                                    ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300'
-                                                    : 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300'
-                                            }`}>
-                                                {accessory.from_wardrobe ? t('recommendation.fromWardrobe') : t('recommendation.needBuy')}
-                                            </span>
-                                        </div>
+                        <div className="rounded-[1.75rem] bg-[var(--bg-card)] p-6 shadow-soft space-y-3">
+                            <h3 className="font-serif text-lg mb-2">{t('recommendation.accessories')}</h3>
+                            {suggestedAccessories.map((accessory, index) => (
+                                <div key={`${accessory.name}-${index}`} className="flex items-start justify-between gap-3 rounded-2xl bg-[var(--secondary)]/50 p-4">
+                                    <div className="flex-1 min-w-0">
+                                        <p className="text-sm font-medium text-[var(--text-primary)]">{accessory.name}</p>
+                                        <p className="text-xs text-[var(--muted-foreground)] mt-1 leading-relaxed">{accessory.reason}</p>
                                         {accessory.item?.image_url && (
-                                            <div className="mt-3 h-24 bg-zinc-100/60 dark:bg-zinc-800/50 rounded-xl p-2">
+                                            <div className="mt-3 h-20 bg-[var(--secondary)] rounded-xl p-2 inline-block">
                                                 <img
                                                     src={toImageUrl(accessory.item.image_url)}
                                                     alt={accessory.name}
-                                                    className="w-full h-full object-contain"
+                                                    className="h-full object-contain"
                                                 />
                                             </div>
                                         )}
                                     </div>
-                                ))}
-                            </div>
+                                    <span className={`shrink-0 inline-flex items-center rounded-full px-2.5 py-1 text-xs ${
+                                        accessory.from_wardrobe ? 'tag-sage' : 'tag-clay'
+                                    }`}>
+                                        {accessory.from_wardrobe ? t('recommendation.fromWardrobe') : t('recommendation.needBuy')}
+                                    </span>
+                                </div>
+                            ))}
                         </div>
                     )}
 
+                    {/* Purchase suggestions */}
                     {purchaseSuggestions.length > 0 && (
-                        <div className="space-y-3 pb-2">
-                            <h3 className="font-serif font-bold text-zinc-900 dark:text-zinc-100 tracking-tight text-lg pl-1">{t('recommendation.purchaseFallback')}</h3>
-                            <div className="space-y-3">
-                                {purchaseSuggestions.map((suggestion, index) => (
-                                    <div key={`${suggestion.category}-${index}`} className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-4">
-                                        <div className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{suggestion.title}</div>
-                                        <div className="text-xs text-zinc-500 mt-1 leading-relaxed">{suggestion.reason}</div>
-                                        {suggestion.keywords?.length > 0 && (
-                                            <div className="text-xs text-zinc-500 mt-2">{t('recommendation.buyKeywords')}: {suggestion.keywords.join(' / ')}</div>
-                                        )}
-                                        {suggestion.horoscope_hint && (
-                                            <div className="text-xs text-blue-600 dark:text-blue-300 mt-2">{suggestion.horoscope_hint}</div>
-                                        )}
-                                    </div>
-                                ))}
+                        <div className="rounded-[1.75rem] border border-[color-mix(in_srgb,var(--accent-clay)_30%,transparent)] bg-[color-mix(in_srgb,var(--accent-clay)_8%,var(--bg-card))] p-6 shadow-soft space-y-3">
+                            <div className="flex items-center gap-2 text-clay mb-2">
+                                <ShoppingBag className="h-4 w-4" />
+                                <span className="text-sm font-medium">{t('recommendation.purchaseFallback')}</span>
                             </div>
+                            {purchaseSuggestions.map((suggestion, index) => (
+                                <div key={`${suggestion.category}-${index}`}>
+                                    <p className="text-sm font-medium text-[var(--text-primary)]">{suggestion.title}</p>
+                                    <p className="text-xs text-[var(--muted-foreground)] mt-1 leading-relaxed">{suggestion.reason}</p>
+                                    {suggestion.keywords?.length > 0 && (
+                                        <div className="mt-2 flex flex-wrap gap-1.5">
+                                            {suggestion.keywords.map(k => (
+                                                <span key={k} className="inline-flex items-center rounded-full px-2.5 py-1 text-xs tag-clay">{k}</span>
+                                            ))}
+                                        </div>
+                                    )}
+                                    {suggestion.horoscope_hint && (
+                                        <p className="mt-2 text-xs text-champagne">✨ {suggestion.horoscope_hint}</p>
+                                    )}
+                                </div>
+                            ))}
                         </div>
                     )}
+
+                    {/* Bottom actions */}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-2">
+                        <button className="btn-secondary" onClick={refreshRecommendation}>
+                            <RefreshCw size={15} />
+                            {t('recommendation.regenerate')}
+                        </button>
+                        <button className="btn-secondary" onClick={() => navigate('/outfit')}>
+                            <Sparkles size={15} />
+                            {t('recommendation.goOutfit')}
+                        </button>
+                        <button className="btn-secondary" onClick={() => navigate('/wardrobe')}>
+                            <Sparkles size={15} />
+                            {t('recommendation.goWardrobe')}
+                        </button>
+                    </div>
                 </div>
             )}
+        </div>
+    )
+}
+
+function HoroscopeStat({ label, value }) {
+    return (
+        <div className="rounded-2xl bg-[var(--bg-card)] p-4 text-center shadow-soft">
+            <p className="mb-1 text-xs text-[var(--muted-foreground)]">{label}</p>
+            <p className="truncate text-sm text-[var(--text-primary)]">{value || '--'}</p>
         </div>
     )
 }

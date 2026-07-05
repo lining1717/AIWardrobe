@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Settings as SettingsIcon, RefreshCw, Sparkles, CloudSun, Droplets, Wind, Thermometer, ChevronLeft, ChevronRight, Shirt, ArrowRight } from 'lucide-react'
+import { Settings as SettingsIcon, RefreshCw, Sparkles, Droplets, Wind, Thermometer, ChevronLeft, ChevronRight, ArrowRight, MapPin, Plus } from 'lucide-react'
 import Settings from '../components/Settings'
 import { API_BASE, toImageUrl } from '../utils/api'
 const FALLBACK_LOCATION = '上海, 上海市, 中国'
@@ -173,167 +173,160 @@ export default function Home() {
         return t('home.categoryAccessory')
     }
 
-    const sectionTitleClass = 'text-sm font-semibold text-zinc-800 dark:text-zinc-100 flex items-center gap-2'
+    const currentItem = carouselItems[activeIndex]
 
     return (
-        <div className="min-h-screen bg-[var(--bg-primary)] pb-28 relative overflow-hidden">
-            <header className="px-4 sm:px-6 lg:px-8 pt-6 pb-4 flex items-start justify-between relative z-10 max-w-6xl mx-auto w-full">
+        <div className="px-5 pb-28 pt-8 md:px-8 md:pb-12 max-w-6xl mx-auto w-full">
+            {/* Page header — overline + serif title + icon actions */}
+            <div className="mb-6 flex items-start justify-between gap-4">
                 <div>
-                    <p className="text-[11px] tracking-[0.08em] text-zinc-500">{t('home.today')}</p>
-                    <p className="text-sm text-zinc-500 mt-1">{formatDate(i18n.language)}</p>
+                    <p className="mb-1.5 text-[11px] uppercase tracking-[0.22em] text-[var(--muted-foreground)]">
+                        {formatDate(i18n.language)}
+                    </p>
+                    <h1 className="text-3xl">{t('home.today')}</h1>
                 </div>
-
                 <div className="flex items-center gap-2">
                     <button
-                        className="w-11 h-11 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white/90 dark:bg-zinc-900/90 flex items-center justify-center text-zinc-600 dark:text-zinc-300 hover:text-accent transition-colors cursor-pointer"
+                        className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--bg-card)] text-[var(--text-secondary)] shadow-soft transition-all duration-300 hover:-translate-y-0.5 hover:text-champagne cursor-pointer"
                         onClick={() => fetchDashboard()}
                         title={t('home.refresh')}
                     >
                         <RefreshCw size={18} className={refreshing ? 'animate-spin' : ''} />
                     </button>
                     <button
-                        className="w-11 h-11 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white/90 dark:bg-zinc-900/90 flex items-center justify-center text-zinc-600 dark:text-zinc-300 hover:text-accent transition-colors cursor-pointer"
+                        className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--bg-card)] text-[var(--text-secondary)] shadow-soft transition-all duration-300 hover:-translate-y-0.5 hover:text-champagne cursor-pointer"
                         onClick={() => setShowSettings(true)}
                         title={t('settings.title')}
                     >
                         <SettingsIcon size={18} />
                     </button>
                 </div>
-            </header>
+            </div>
 
-            <main className="px-4 sm:px-6 lg:px-8 relative z-10 max-w-6xl mx-auto w-full pb-2">
-                <div className="grid gap-4 lg:grid-cols-12">
-                    <section className="card p-4 sm:p-5 lg:col-span-5">
-                        <div className="flex items-center justify-between">
-                            <h2 className={sectionTitleClass}>
-                                <CloudSun size={18} className="text-accent" />
-                                {t('home.weatherTitle')}
-                            </h2>
-                            <span className="text-[11px] px-2 py-1 rounded-md bg-zinc-100 dark:bg-zinc-800 text-zinc-500">
-                                {weather?.icon || '--'}
-                            </span>
+            <div className="grid grid-cols-1 gap-5 md:grid-cols-12">
+                {/* Weather card — big serif temperature */}
+                <section className="relative overflow-hidden rounded-[1.75rem] bg-[var(--bg-card)] p-6 shadow-soft md:col-span-5">
+                    <div
+                        className="absolute -right-6 -top-8 select-none text-[9rem] leading-none opacity-15"
+                        aria-hidden
+                    >
+                        {weather?.icon || '🌤'}
+                    </div>
+                    <div className="relative flex items-center gap-1.5 text-[var(--muted-foreground)]">
+                        <MapPin className="h-3.5 w-3.5" />
+                        <span className="text-sm">
+                            {weatherLoading ? t('home.loading') : (weather?.location || t('home.unknownLocation'))}
+                        </span>
+                    </div>
+
+                    {weatherLoading ? (
+                        <div className="relative mt-6 flex items-center gap-2 text-sm text-[var(--muted-foreground)]">
+                            <div className="w-4 h-4 border-2 border-[var(--border)] border-t-champagne rounded-full animate-spin" />
+                            {t('home.loading')}
                         </div>
-
-                        {weatherLoading ? (
-                            <div className="mt-4 flex items-center gap-2 text-sm text-zinc-500">
-                                <div className="w-4 h-4 border-2 border-zinc-300 dark:border-zinc-700 border-t-accent rounded-full animate-spin"></div>
-                                {t('home.loading')}
+                    ) : (
+                        <>
+                            <div className="relative mt-4 flex items-end gap-2">
+                                <span className="font-serif text-6xl leading-none text-[var(--text-primary)]">
+                                    {weather ? `${Math.round(weather.temperature)}°` : '--'}
+                                </span>
+                                <span className="mb-2 text-[var(--muted-foreground)]">
+                                    {weather?.condition || t('home.unknownWeather')}
+                                </span>
                             </div>
-                        ) : (
-                            <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-                                <div>
-                                    <div className="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
-                                        {weather ? `${Math.round(weather.temperature)}°` : '--'}
-                                    </div>
-                                    <div className="text-sm text-zinc-500 mt-1 break-words">
-                                        {weather?.location || t('home.unknownLocation')} · {weather?.condition || t('home.unknownWeather')}
-                                    </div>
-                                </div>
-                                <div className="text-xs text-zinc-500 space-y-1">
-                                    <div className="flex items-center gap-1.5">
-                                        <Thermometer size={13} />
-                                        {t('home.weatherFeelsLike')}: {weather ? `${Math.round(weather.feelsLike)}°` : '--'}
-                                    </div>
-                                    <div className="flex items-center gap-1.5">
-                                        <Droplets size={13} />
-                                        {t('home.weatherHumidity')}: {weather ? `${Math.round(weather.humidity)}%` : '--'}
-                                    </div>
-                                    <div className="flex items-center gap-1.5">
-                                        <Wind size={13} />
-                                        {t('home.weatherWind')}: {weather?.windScale || '--'}
-                                    </div>
-                                </div>
+                            <div className="relative mt-6 grid grid-cols-3 gap-2">
+                                <WeatherMetric icon={<Thermometer className="h-4 w-4" />} label={t('home.weatherFeelsLike')} value={weather ? `${Math.round(weather.feelsLike)}°` : '--'} />
+                                <WeatherMetric icon={<Droplets className="h-4 w-4" />} label={t('home.weatherHumidity')} value={weather ? `${Math.round(weather.humidity)}%` : '--'} />
+                                <WeatherMetric icon={<Wind className="h-4 w-4" />} label={t('home.weatherWind')} value={weather?.windScale || '--'} />
                             </div>
-                        )}
-                    </section>
+                        </>
+                    )}
+                </section>
 
-                    <section className="card p-4 sm:p-5 lg:col-span-7">
-                        <div className="flex items-center justify-between mb-3">
-                            <h2 className={sectionTitleClass}>
-                                <Shirt size={18} className="text-accent" />
-                                {t('home.carouselTitle')}
-                            </h2>
+                {/* Wardrobe carousel — cover image with overlay */}
+                <section className="md:col-span-7">
+                    <div className="h-full rounded-[1.75rem] bg-[var(--bg-card)] p-6 shadow-soft">
+                        <div className="mb-4 flex items-center justify-between">
+                            <h3 className="font-serif text-lg">{t('home.carouselTitle')}</h3>
                             <button
-                                className="text-xs px-2.5 py-1 rounded-md bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 hover:text-accent cursor-pointer transition-colors"
+                                className="flex items-center gap-1 text-sm text-champagne hover:opacity-70 transition-opacity cursor-pointer"
                                 onClick={() => navigate('/wardrobe')}
                             >
-                                {t('home.viewAll')}
+                                {t('home.viewAll')} <ArrowRight className="h-3.5 w-3.5" />
                             </button>
                         </div>
 
                         {wardrobeLoading ? (
-                            <div className="rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50/70 dark:bg-zinc-800/40 p-8 text-center">
-                                <div className="w-6 h-6 mx-auto border-2 border-zinc-300 dark:border-zinc-700 border-t-accent rounded-full animate-spin"></div>
-                                <p className="text-sm text-zinc-500 mt-3">{t('home.loading')}</p>
+                            <div className="flex aspect-[16/10] items-center justify-center rounded-3xl bg-[var(--secondary)]/60">
+                                <div className="w-6 h-6 border-2 border-[var(--border)] border-t-champagne rounded-full animate-spin" />
                             </div>
                         ) : carouselItems.length === 0 ? (
-                            <div className="rounded-xl border border-dashed border-zinc-200 dark:border-zinc-700 bg-zinc-50/70 dark:bg-zinc-800/40 p-8 text-center">
-                                <p className="text-sm text-zinc-500">{t('home.emptyWardrobe')}</p>
-                                <button
-                                    className="mt-3 inline-flex items-center gap-1.5 text-sm text-accent hover:opacity-80 cursor-pointer"
-                                    onClick={() => navigate('/entry')}
-                                >
-                                    {t('home.goEntry')}
-                                    <ArrowRight size={14} />
-                                </button>
-                            </div>
+                            <button
+                                onClick={() => navigate('/entry')}
+                                className="flex aspect-[16/10] w-full flex-col items-center justify-center rounded-3xl border border-dashed border-[var(--border)] bg-[var(--secondary)]/40 text-[var(--muted-foreground)] transition-colors hover:text-champagne cursor-pointer"
+                            >
+                                <Plus className="mb-2 h-8 w-8" />
+                                <span className="text-sm">{t('home.emptyWardrobe')}</span>
+                                <span className="mt-1 flex items-center gap-1 text-xs text-champagne">
+                                    {t('home.goEntry')} <ArrowRight className="h-3 w-3" />
+                                </span>
+                            </button>
                         ) : (
-                            <div className="relative">
-                                <div className="overflow-hidden rounded-xl bg-zinc-50/80 dark:bg-zinc-800/40 border border-zinc-200 dark:border-zinc-700">
-                                    <div
-                                        className="flex transition-transform duration-500 ease-out"
-                                        style={{ transform: `translateX(-${activeIndex * 100}%)` }}
-                                    >
-                                        {carouselItems.map(item => (
-                                            <article key={item.id} className="w-full shrink-0 p-4">
-                                                <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                                                    <div className="w-24 h-24 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 p-2 flex items-center justify-center">
-                                                        <img
-                                                            src={toImageUrl(item.image_url)}
-                                                            alt={item.item}
-                                                            className="w-full h-full object-contain"
-                                                        />
-                                                    </div>
-                                                    <div className="min-w-0">
-                                                        <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 truncate">{item.item}</h3>
-                                                        <p className="text-xs text-zinc-500 mt-1">{getCategoryLabel(item.category)}</p>
-                                                        {item.description ? (
-                                                            <p className="text-xs text-zinc-500 mt-2 line-clamp-2">{item.description}</p>
-                                                        ) : (
-                                                            <p className="text-xs text-zinc-400 mt-2">{t('home.noDescription')}</p>
-                                                        )}
-                                                    </div>
+                            <div>
+                                <div className="relative overflow-hidden rounded-3xl bg-[var(--secondary)]">
+                                    {currentItem && (
+                                        <div
+                                            key={currentItem.id}
+                                            className="relative aspect-[16/10] cursor-pointer transition-opacity duration-500"
+                                            onClick={() => navigate(`/clothes/${currentItem.id}`)}
+                                        >
+                                            <img
+                                                src={toImageUrl(currentItem.image_url)}
+                                                alt={currentItem.item}
+                                                className="h-full w-full object-cover"
+                                            />
+                                            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/55 to-transparent p-5">
+                                                <div className="mb-1 flex items-center gap-2">
+                                                    <span className="inline-flex items-center rounded-full px-2.5 py-1 text-xs tag-champagne">
+                                                        {getCategoryLabel(currentItem.category)}
+                                                    </span>
                                                 </div>
-                                            </article>
-                                        ))}
-                                    </div>
+                                                <p className="font-serif text-xl text-white">{currentItem.item}</p>
+                                                {currentItem.description && (
+                                                    <p className="mt-0.5 text-sm text-white/80 line-clamp-1">{currentItem.description}</p>
+                                                )}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {carouselItems.length > 1 && (
+                                        <>
+                                            <button
+                                                onClick={() => setActiveIndex(prev => (prev > 0 ? prev - 1 : carouselItems.length - 1))}
+                                                className="absolute left-3 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full glass text-[var(--text-primary)] cursor-pointer"
+                                                aria-label={t('home.previous')}
+                                            >
+                                                <ChevronLeft className="h-5 w-5" />
+                                            </button>
+                                            <button
+                                                onClick={() => setActiveIndex(prev => (prev < carouselItems.length - 1 ? prev + 1 : 0))}
+                                                className="absolute right-3 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full glass text-[var(--text-primary)] cursor-pointer"
+                                                aria-label={t('home.next')}
+                                            >
+                                                <ChevronRight className="h-5 w-5" />
+                                            </button>
+                                        </>
+                                    )}
                                 </div>
 
                                 {carouselItems.length > 1 && (
-                                    <>
-                                        <button
-                                            className="absolute left-2 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white/90 dark:bg-zinc-900/90 border border-zinc-200 dark:border-zinc-700 flex items-center justify-center text-zinc-600 dark:text-zinc-300 hover:text-accent transition-colors cursor-pointer"
-                                            onClick={() => setActiveIndex(prev => (prev > 0 ? prev - 1 : carouselItems.length - 1))}
-                                            aria-label={t('home.previous')}
-                                        >
-                                            <ChevronLeft size={16} />
-                                        </button>
-                                        <button
-                                            className="absolute right-2 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white/90 dark:bg-zinc-900/90 border border-zinc-200 dark:border-zinc-700 flex items-center justify-center text-zinc-600 dark:text-zinc-300 hover:text-accent transition-colors cursor-pointer"
-                                            onClick={() => setActiveIndex(prev => (prev < carouselItems.length - 1 ? prev + 1 : 0))}
-                                            aria-label={t('home.next')}
-                                        >
-                                            <ChevronRight size={16} />
-                                        </button>
-                                    </>
-                                )}
-
-                                {carouselItems.length > 1 && (
-                                    <div className="flex items-center justify-center gap-1.5 mt-3">
+                                    <div className="mt-4 flex justify-center gap-1.5">
                                         {carouselItems.map((_, idx) => (
                                             <button
                                                 key={idx}
-                                                className={`h-1.5 rounded-full transition-all cursor-pointer ${idx === activeIndex ? 'w-5 bg-accent' : 'w-1.5 bg-zinc-300 dark:bg-zinc-600'}`}
+                                                className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
+                                                    idx === activeIndex ? 'w-6 bg-champagne' : 'w-1.5 bg-[var(--border)]'
+                                                }`}
                                                 onClick={() => setActiveIndex(idx)}
                                                 aria-label={`${t('home.slide')} ${idx + 1}`}
                                             />
@@ -342,64 +335,66 @@ export default function Home() {
                                 )}
                             </div>
                         )}
-                    </section>
+                    </div>
+                </section>
 
-                    <section className="card p-4 sm:p-5 lg:col-span-12">
-                        <div className="flex items-center justify-between mb-3">
-                            <h2 className={sectionTitleClass}>
-                                <Sparkles size={18} className="text-accent" />
-                                {t('home.horoscopeTitle')}
-                            </h2>
-                            <span className="text-xs px-2 py-1 rounded-md bg-blue-50 dark:bg-blue-900/30 text-accent">
+                {/* Horoscope card — warm champagne tint */}
+                <section className="md:col-span-12">
+                    <div className="rounded-[1.75rem] bg-[var(--bg-card)] p-6 shadow-soft">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--accent-rose)_22%,transparent)] text-champagne">
+                                    <Sparkles className="h-4 w-4" />
+                                </span>
+                                <span className="font-serif text-lg">{t('home.horoscopeTitle')}</span>
+                            </div>
+                            <span className="text-xs text-[var(--muted-foreground)]">
                                 {horoscope?.zodiac_name || t('home.unknownZodiac')}
                             </span>
                         </div>
 
                         {horoscopeLoading ? (
-                            <div className="flex items-center gap-2 text-sm text-zinc-500">
-                                <div className="w-4 h-4 border-2 border-zinc-300 dark:border-zinc-700 border-t-accent rounded-full animate-spin"></div>
+                            <div className="mt-4 flex items-center gap-2 text-sm text-[var(--muted-foreground)]">
+                                <div className="w-4 h-4 border-2 border-[var(--border)] border-t-champagne rounded-full animate-spin" />
                                 {t('home.loading')}
                             </div>
                         ) : (
                             <>
-                                <p className="text-sm text-zinc-700 dark:text-zinc-200 leading-relaxed">{horoscope?.summary || t('home.horoscopeFallback')}</p>
+                                <p className="mt-4 text-sm leading-relaxed text-[var(--muted-foreground)]">
+                                    {horoscope?.summary || t('home.horoscopeFallback')}
+                                </p>
 
-                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-4">
-                                    <div className="rounded-lg bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700 p-2.5">
-                                        <div className="text-[10px] uppercase tracking-wide text-zinc-500">{t('home.mood')}</div>
-                                        <div className="text-xs font-semibold text-zinc-900 dark:text-zinc-100 mt-1 truncate">{horoscope?.mood || '--'}</div>
-                                    </div>
-                                    <div className="rounded-lg bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700 p-2.5">
-                                        <div className="text-[10px] uppercase tracking-wide text-zinc-500">{t('home.luckyColor')}</div>
-                                        <div className="text-xs font-semibold text-zinc-900 dark:text-zinc-100 mt-1 truncate">{horoscope?.lucky_color || '--'}</div>
-                                    </div>
-                                    <div className="rounded-lg bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700 p-2.5">
-                                        <div className="text-[10px] uppercase tracking-wide text-zinc-500">{t('home.luckyNumber')}</div>
-                                        <div className="text-xs font-semibold text-zinc-900 dark:text-zinc-100 mt-1 truncate">{horoscope?.lucky_number || '--'}</div>
-                                    </div>
+                                <div className="mt-5 grid grid-cols-3 gap-2">
+                                    <HoroscopeCell label={t('home.mood')} value={horoscope?.mood || '--'} />
+                                    <HoroscopeCell label={t('home.luckyColor')} value={horoscope?.lucky_color || '--'} />
+                                    <HoroscopeCell label={t('home.luckyNumber')} value={horoscope?.lucky_number || '--'} />
                                 </div>
 
-                                <div className="mt-3 text-xs text-zinc-500 leading-relaxed">
-                                    {horoscope?.suggestion || t('home.horoscopeFallback')}
-                                </div>
+                                {horoscope?.suggestion && (
+                                    <div className="mt-4 rounded-2xl bg-[color-mix(in_srgb,var(--accent-champagne)_10%,transparent)] p-3">
+                                        <p className="text-sm text-[var(--text-primary)]">✨ {horoscope.suggestion}</p>
+                                    </div>
+                                )}
 
-                                <div className="mt-4 rounded-lg bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700 p-3">
-                                    <div className="text-[10px] uppercase tracking-wide text-zinc-500">{t('home.llmReasoningTitle')}</div>
-                                    {horoscopeInferenceLoading ? (
-                                        <div className="mt-2 flex items-center gap-2 text-xs text-zinc-500">
-                                            <div className="w-4 h-4 border-2 border-zinc-300 dark:border-zinc-700 border-t-accent rounded-full animate-spin"></div>
-                                            {t('home.llmReasoningLoading')}
-                                        </div>
-                                    ) : (
-                                        <p className="mt-2 text-[11px] text-zinc-500 dark:text-zinc-400 leading-relaxed">
-                                            {horoscope?.llm_reasoning || t('home.llmReasoningFallback')}
-                                        </p>
-                                    )}
-                                </div>
+                                {horoscope?.llm_reasoning && (
+                                    <div className="mt-3 rounded-2xl bg-[var(--secondary)]/60 p-3">
+                                        <div className="text-[10px] uppercase tracking-wide text-[var(--muted-foreground)]">{t('home.llmReasoningTitle')}</div>
+                                        {horoscopeInferenceLoading ? (
+                                            <div className="mt-2 flex items-center gap-2 text-xs text-[var(--muted-foreground)]">
+                                                <div className="w-4 h-4 border-2 border-[var(--border)] border-t-champagne rounded-full animate-spin" />
+                                                {t('home.llmReasoningLoading')}
+                                            </div>
+                                        ) : (
+                                            <p className="mt-2 text-[11px] text-[var(--muted-foreground)] leading-relaxed">
+                                                {horoscope.llm_reasoning}
+                                            </p>
+                                        )}
+                                    </div>
+                                )}
 
                                 {horoscope && !horoscope.is_configured && (
                                     <button
-                                        className="mt-4 w-full py-2.5 rounded-lg bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 text-sm font-medium hover:opacity-90 cursor-pointer transition-opacity"
+                                        className="mt-4 w-full rounded-full bg-champagne py-2.5 text-sm text-white shadow-soft hover:opacity-90 cursor-pointer transition-opacity"
                                         onClick={() => setShowSettings(true)}
                                     >
                                         {t('home.setZodiac')}
@@ -407,15 +402,34 @@ export default function Home() {
                                 )}
                             </>
                         )}
-                    </section>
-                </div>
-            </main>
+                    </div>
+                </section>
+            </div>
 
             <Settings
                 isOpen={showSettings}
                 onClose={() => setShowSettings(false)}
                 onSave={handleSettingsSaved}
             />
+        </div>
+    )
+}
+
+function WeatherMetric({ icon, label, value }) {
+    return (
+        <div className="rounded-2xl bg-[var(--secondary)]/60 p-3 text-center">
+            <div className="mb-1 flex justify-center text-champagne">{icon}</div>
+            <p className="text-xs text-[var(--muted-foreground)]">{label}</p>
+            <p className="text-sm text-[var(--text-primary)]">{value}</p>
+        </div>
+    )
+}
+
+function HoroscopeCell({ label, value }) {
+    return (
+        <div className="rounded-2xl bg-[var(--secondary)]/60 p-3 text-center">
+            <p className="mb-1 text-xs text-[var(--muted-foreground)]">{label}</p>
+            <p className="truncate text-sm text-[var(--text-primary)]">{value}</p>
         </div>
     )
 }

@@ -82,24 +82,31 @@ export default function Entry() {
 
     if (editingItem) {
         return (
-            <div className="min-h-screen bg-[var(--bg-primary)] flex flex-col animate-fade-in relative z-20">
-                <header className="glass-header px-4 py-4 flex items-center justify-between sticky top-0">
-                    <button className="btn-icon" onClick={() => setEditingItem(null)}>
-                        <ArrowLeft size={24} />
-                    </button>
-                    <h2 className="text-xl font-serif font-semibold text-[var(--text-primary)]">{t('entry.editTitle')}</h2>
+            <div className="flex flex-col animate-fade-in relative z-20 min-h-screen">
+                <header className="glass-header px-5 py-4 flex items-center justify-between">
                     <button
-                        className={`text-sm font-medium px-4 py-2 rounded-lg flex items-center gap-1.5 transition-colors ${loading ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-400' : 'bg-accent text-white hover:bg-blue-700'}`}
+                        className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--bg-card)] text-[var(--text-secondary)] shadow-soft transition-all duration-300 hover:-translate-y-0.5 hover:text-champagne cursor-pointer"
+                        onClick={() => setEditingItem(null)}
+                    >
+                        <ArrowLeft size={20} />
+                    </button>
+                    <h2 className="font-serif text-xl">{t('entry.editTitle')}</h2>
+                    <button
+                        className={`flex items-center gap-1.5 rounded-full px-5 py-2 text-sm font-medium transition-all ${
+                            loading
+                                ? 'bg-[var(--secondary)] text-[var(--muted-foreground)]'
+                                : 'bg-champagne text-white shadow-soft hover:opacity-90'
+                        }`}
                         onClick={handleSave}
                         disabled={loading}
                     >
-                        {loading ? <span className="w-4 h-4 border-2 border-zinc-300 border-t-zinc-500 rounded-full animate-spin"></span> : <Save size={18} />}
+                        {loading ? <span className="w-4 h-4 border-2 border-[var(--border)] border-t-champagne rounded-full animate-spin" /> : <Save size={18} />}
                         <span>{loading ? t('entry.saving') : t('entry.save')}</span>
                     </button>
                 </header>
 
-                <div className="flex-1 overflow-y-auto pb-24 px-4 space-y-6">
-                    <div className="w-full aspect-square bg-zinc-100 dark:bg-zinc-800 rounded-2xl overflow-hidden shadow-sm border border-zinc-200 dark:border-zinc-700 p-6 flex flex-col items-center justify-center mt-4">
+                <div className="flex-1 overflow-y-auto pb-28 px-5 pt-6 space-y-6 max-w-3xl mx-auto w-full">
+                    <div className="w-full aspect-square bg-[var(--secondary)] rounded-[1.75rem] overflow-hidden shadow-soft p-8 flex flex-col items-center justify-center">
                         <img
                             src={toImageUrl(editingItem.image_url)}
                             alt="Preview"
@@ -108,12 +115,12 @@ export default function Entry() {
                     </div>
 
                     <div className="space-y-6">
-                        <section className="bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm space-y-4">
-                            <h3 className="text-sm font-semibold uppercase tracking-wider text-zinc-500 mb-2">{t('entry.basicInfo')}</h3>
+                        <section className="rounded-[1.75rem] bg-[var(--bg-card)] p-6 shadow-soft space-y-4">
+                            <h3 className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--muted-foreground)]">{t('entry.basicInfo')}</h3>
 
                             <div className="space-y-1.5">
-                                <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300 flex items-center gap-1.5">
-                                    <Tag className="text-accent" size={16} /> {t('entry.name')}
+                                <label className="text-sm font-medium text-[var(--text-secondary)] flex items-center gap-1.5">
+                                    <Tag className="text-champagne" size={16} /> {t('entry.name')}
                                 </label>
                                 <input
                                     type="text"
@@ -126,14 +133,14 @@ export default function Entry() {
                             </div>
 
                             <div className="space-y-1.5">
-                                <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300 flex items-center gap-1.5">
-                                    <Shirt className="text-accent" size={16} /> {t('entry.category')}
+                                <label className="text-sm font-medium text-[var(--text-secondary)] flex items-center gap-1.5">
+                                    <Shirt className="text-champagne" size={16} /> {t('entry.category')}
                                 </label>
                                 <select
                                     name="category"
                                     value={formData.category}
                                     onChange={handleChange}
-                                    className="input-field appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M5%208l5%205%205-5%22%20stroke%3D%22%239ca3af%22%20stroke-width%3D%222%22%20fill%3D%22none%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fsvg%3E')] bg-[length:20px_20px] bg-[right_10px_center] bg-no-repeat pr-10"
+                                    className="input-field appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2Fsvg%22%3E%3Cpath%20d%3D%22M5%208l5%205%205-5%22%20stroke%3D%22%23b99872%22%20stroke-width%3D%222%22%20fill%3D%22none%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fsvg%3E')] bg-[length:20px_20px] bg-[right_14px_center] bg-no-repeat pr-10"
                                 >
                                     <option value="top">{t('entry.categoryTop')}</option>
                                     <option value="bottom">{t('entry.categoryBottom')}</option>
@@ -143,12 +150,12 @@ export default function Entry() {
                             </div>
                         </section>
 
-                        <section className="bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm space-y-4">
-                            <h3 className="text-sm font-semibold uppercase tracking-wider text-zinc-500 mb-2">{t('entry.features')}</h3>
+                        <section className="rounded-[1.75rem] bg-[var(--bg-card)] p-6 shadow-soft space-y-4">
+                            <h3 className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--muted-foreground)]">{t('entry.features')}</h3>
 
                             <div className="space-y-1.5">
-                                <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300 flex items-center gap-1.5">
-                                    <Palette className="text-accent" size={16} /> {t('entry.color')}
+                                <label className="text-sm font-medium text-[var(--text-secondary)] flex items-center gap-1.5">
+                                    <Palette className="text-champagne" size={16} /> {t('entry.color')}
                                 </label>
                                 <input
                                     type="text"
@@ -161,8 +168,8 @@ export default function Entry() {
                             </div>
 
                             <div className="space-y-1.5">
-                                <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300 flex items-center gap-1.5">
-                                    <Layers className="text-accent" size={16} /> {t('entry.style')}
+                                <label className="text-sm font-medium text-[var(--text-secondary)] flex items-center gap-1.5">
+                                    <Layers className="text-champagne" size={16} /> {t('entry.style')}
                                 </label>
                                 <input
                                     type="text"
@@ -175,8 +182,8 @@ export default function Entry() {
                             </div>
 
                             <div className="space-y-1.5">
-                                <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300 flex items-center gap-1.5">
-                                    <CloudSun className="text-accent" size={16} /> {t('entry.season')}
+                                <label className="text-sm font-medium text-[var(--text-secondary)] flex items-center gap-1.5">
+                                    <CloudSun className="text-champagne" size={16} /> {t('entry.season')}
                                 </label>
                                 <input
                                     type="text"
@@ -189,9 +196,9 @@ export default function Entry() {
                             </div>
                         </section>
 
-                        <section className="bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm space-y-4">
-                            <h3 className="text-sm font-semibold uppercase tracking-wider text-zinc-500 flex items-center gap-1.5 mb-2">
-                                <FileText className="text-accent" size={16} /> {t('entry.description')}
+                        <section className="rounded-[1.75rem] bg-[var(--bg-card)] p-6 shadow-soft space-y-4">
+                            <h3 className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--muted-foreground)] flex items-center gap-1.5">
+                                <FileText className="text-champagne" size={16} /> {t('entry.description')}
                             </h3>
                             <textarea
                                 name="description"
@@ -209,25 +216,29 @@ export default function Entry() {
     }
 
     return (
-        <div className="min-h-screen bg-[var(--bg-primary)] p-4 sm:px-6 lg:px-8 flex flex-col pt-safe">
-            <header className="flex items-center justify-between mb-6 mt-4 max-w-6xl mx-auto w-full">
-                <h1 className="text-3xl font-serif font-bold tracking-tight text-[var(--text-primary)]">{t('entry.title')}</h1>
+        <div className="px-5 pb-28 pt-8 md:px-8 md:pb-12 max-w-6xl mx-auto w-full flex flex-col">
+            <div className="mb-6 flex items-start justify-between gap-4">
+                <div>
+                    <p className="mb-1.5 text-[11px] uppercase tracking-[0.22em] text-[var(--muted-foreground)]">Add Piece</p>
+                    <h1 className="text-3xl">{t('entry.title')}</h1>
+                </div>
                 <button
-                    className="p-2.5 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600 rounded-xl shadow-sm transition-all hover:-translate-y-0.5"
+                    className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--bg-card)] text-[var(--text-secondary)] shadow-soft transition-all duration-300 hover:-translate-y-0.5 hover:text-champagne cursor-pointer"
                     onClick={() => setShowSettings(true)}
+                    title={t('settings.title')}
                 >
-                    <SettingsIcon className="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200" size={20} />
+                    <SettingsIcon size={18} />
                 </button>
-            </header>
+            </div>
 
-            <section className="card p-5 mb-5 max-w-6xl mx-auto w-full">
+            <section className="rounded-[1.75rem] bg-[var(--bg-card)] p-6 shadow-soft mb-6">
                 <div className="flex items-start justify-between gap-3">
                     <div>
-                        <p className="text-xs tracking-widest text-zinc-500 uppercase">{t('entry.heroTag')}</p>
-                        <h2 className="mt-1 text-xl font-serif font-bold text-zinc-900 dark:text-zinc-100">{t('entry.heroTitle')}</h2>
-                        <p className="mt-2 text-sm text-zinc-500 leading-relaxed">{t('entry.heroSubtitle')}</p>
+                        <p className="text-[11px] uppercase tracking-[0.22em] text-[var(--muted-foreground)]">{t('entry.heroTag')}</p>
+                        <h2 className="mt-1 font-serif text-xl">{t('entry.heroTitle')}</h2>
+                        <p className="mt-2 text-sm text-[var(--muted-foreground)] leading-relaxed">{t('entry.heroSubtitle')}</p>
                     </div>
-                    <div className="w-10 h-10 rounded-xl bg-accent/10 text-accent flex items-center justify-center shrink-0">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--accent-champagne)_16%,transparent)] text-champagne">
                         <Sparkles size={18} />
                     </div>
                 </div>
@@ -244,22 +255,22 @@ export default function Entry() {
                 </div>
 
                 <div className="mt-4 grid grid-cols-3 gap-2 text-center">
-                    <div className="rounded-lg bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700 px-2 py-2">
-                        <div className="text-[10px] text-zinc-400">01</div>
-                        <div className="text-xs text-zinc-600 dark:text-zinc-300 mt-0.5">{t('entry.stepUpload')}</div>
+                    <div className="rounded-2xl bg-[var(--secondary)]/60 px-2 py-2.5">
+                        <div className="text-[10px] text-champagne font-serif">01</div>
+                        <div className="text-xs text-[var(--text-secondary)] mt-0.5">{t('entry.stepUpload')}</div>
                     </div>
-                    <div className="rounded-lg bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700 px-2 py-2">
-                        <div className="text-[10px] text-zinc-400">02</div>
-                        <div className="text-xs text-zinc-600 dark:text-zinc-300 mt-0.5">{t('entry.stepEdit')}</div>
+                    <div className="rounded-2xl bg-[var(--secondary)]/60 px-2 py-2.5">
+                        <div className="text-[10px] text-champagne font-serif">02</div>
+                        <div className="text-xs text-[var(--text-secondary)] mt-0.5">{t('entry.stepEdit')}</div>
                     </div>
-                    <div className="rounded-lg bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700 px-2 py-2">
-                        <div className="text-[10px] text-zinc-400">03</div>
-                        <div className="text-xs text-zinc-600 dark:text-zinc-300 mt-0.5">{t('entry.stepRecommend')}</div>
+                    <div className="rounded-2xl bg-[var(--secondary)]/60 px-2 py-2.5">
+                        <div className="text-[10px] text-champagne font-serif">03</div>
+                        <div className="text-xs text-[var(--text-secondary)] mt-0.5">{t('entry.stepRecommend')}</div>
                     </div>
                 </div>
             </section>
 
-            <div className="flex-1 overflow-y-auto max-w-6xl mx-auto w-full">
+            <div className="flex-1">
                 <Upload onUploadSuccess={handleUploadSuccess} />
             </div>
 

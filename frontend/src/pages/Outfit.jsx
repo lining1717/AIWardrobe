@@ -137,7 +137,7 @@ export default function Outfit() {
 
     if (loading) return (
         <div className="flex flex-col items-center justify-center min-h-[60vh]">
-            <div className="w-10 h-10 border-4 border-zinc-200 dark:border-zinc-700 border-t-accent rounded-full animate-spin"></div>
+            <div className="w-10 h-10 border-4 border-[var(--border)] border-t-champagne rounded-full animate-spin" />
         </div>
     )
 
@@ -146,90 +146,75 @@ export default function Outfit() {
     const shoesItem = getCurrentItem('shoes')
 
     return (
-        <div className="bg-[var(--bg-primary)] px-3 sm:px-4 lg:px-0 pt-3 pb-2 flex flex-col max-w-6xl mx-auto w-full">
-            <header className="shrink-0 mb-3">
-                <div className="flex items-center justify-between mb-2">
-                    <h2 className="text-[22px] font-serif font-bold tracking-tight text-[var(--text-primary)]">{t('outfit.title')}</h2>
+        <div className="max-w-6xl mx-auto w-full px-5 md:px-8 pt-8 pb-28 md:pb-12">
+            <div className="mb-6">
+                <div className="flex items-start justify-between gap-4 mb-4">
+                    <div>
+                        <p className="mb-1.5 text-[11px] uppercase tracking-[0.22em] text-[var(--muted-foreground)]">Mix & Match</p>
+                        <h1 className="font-serif text-3xl">{t('outfit.title')}</h1>
+                    </div>
                     <button
-                        className="btn-icon bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 hover:border-accent hover:text-accent rounded-lg shadow-sm"
+                        className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--bg-card)] text-[var(--text-secondary)] shadow-soft transition-all duration-300 hover:-translate-y-0.5 hover:text-champagne cursor-pointer"
                         onClick={shuffleOutfit}
                         title={t('outfit.shuffle')}
                     >
-                        <Shuffle size={18} className="group-active:-rotate-90 transition-transform duration-300" />
+                        <Shuffle size={18} />
                     </button>
                 </div>
 
-                <div className="flex gap-1.5 overflow-x-auto hide-scrollbar pb-0.5">
+                <div className="flex gap-2 overflow-x-auto hide-scrollbar pb-0.5">
                     {seasonFilters.map(s => (
                         <button
                             key={s.key}
-                            className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-all duration-300 ${
+                            className={`shrink-0 rounded-full px-4 py-1.5 text-sm font-medium whitespace-nowrap transition-all duration-300 border ${
                                 filterSeason === s.key
-                                    ? 'bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 shadow-md'
-                                    : 'bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-700 hover:text-zinc-900 dark:hover:text-zinc-200'
-                                }`}
+                                    ? 'bg-champagne text-white border-transparent shadow-soft'
+                                    : 'bg-[var(--bg-card)]/60 text-[var(--muted-foreground)] border-[var(--border)] hover:border-[var(--accent)]/40 hover:text-[var(--text-primary)]'
+                            }`}
                             onClick={() => setFilterSeason(s.key)}
                         >
                             {s.label}
                         </button>
                     ))}
                 </div>
-            </header>
+            </div>
 
-            <div className="grid gap-3 lg:grid-cols-12">
-                <section className="card lg:col-span-7 overflow-hidden">
-                    <div className="p-3 sm:p-4 bg-zinc-50/40 dark:bg-zinc-900/30">
-                        <div className="rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 overflow-hidden p-2 sm:p-3">
-                            <div className="h-[44vh] min-h-[340px] max-h-[560px] grid grid-rows-[44%_34%_22%] gap-2">
-                                <div className="rounded-xl bg-zinc-100 dark:bg-zinc-800 p-2 flex items-center justify-center">
-                                    {topItem ? (
-                                        <img src={toImageUrl(topItem.image_url)} alt={topItem.item} className="w-full h-full object-contain" />
-                                    ) : (
-                                        <span className="text-xs text-zinc-400">{t('outfit.noItems', { label: t('outfit.top') })}</span>
-                                    )}
-                                </div>
-                                <div className="rounded-xl bg-zinc-100 dark:bg-zinc-800 p-2 flex items-center justify-center">
-                                    {bottomItem ? (
-                                        <img src={toImageUrl(bottomItem.image_url)} alt={bottomItem.item} className="w-full h-full object-contain" />
-                                    ) : (
-                                        <span className="text-xs text-zinc-400">{t('outfit.noItems', { label: t('outfit.bottom') })}</span>
-                                    )}
-                                </div>
-                                <div className="rounded-xl bg-zinc-100 dark:bg-zinc-800 p-2 flex items-center justify-center">
-                                    {shoesItem ? (
-                                        <img src={toImageUrl(shoesItem.image_url)} alt={shoesItem.item} className="w-full h-full object-contain" />
-                                    ) : (
-                                        <span className="text-xs text-zinc-400">{t('outfit.noItems', { label: t('outfit.shoes') })}</span>
-                                    )}
-                                </div>
-                            </div>
+            <div className="grid gap-4 lg:grid-cols-12">
+                {/* Preview stack */}
+                <section className="rounded-[1.75rem] bg-[var(--bg-card)] p-5 shadow-soft lg:col-span-7">
+                    <div className="rounded-3xl border border-[var(--border)] bg-[var(--secondary)]/40 overflow-hidden p-3">
+                        <div className="h-[44vh] min-h-[340px] max-h-[560px] grid grid-rows-[44%_34%_22%] gap-2">
+                            <OutfitSlot item={topItem} emptyLabel={t('outfit.noItems', { label: t('outfit.top') })} onClick={() => topItem && navigate(`/clothes/${topItem.id}`)} />
+                            <OutfitSlot item={bottomItem} emptyLabel={t('outfit.noItems', { label: t('outfit.bottom') })} onClick={() => bottomItem && navigate(`/clothes/${bottomItem.id}`)} />
+                            <OutfitSlot item={shoesItem} emptyLabel={t('outfit.noItems', { label: t('outfit.shoes') })} onClick={() => shoesItem && navigate(`/clothes/${shoesItem.id}`)} />
                         </div>
                     </div>
                 </section>
 
+                {/* Category pickers */}
                 <aside className="lg:col-span-5 grid grid-cols-1 gap-3">
                     {CATEGORIES.map((category) => {
                         const items = getItemsByCategory(category.key)
                         const item = getCurrentItem(category.key)
                         const currentIndex = currentIndices[category.key] || 0
                         return (
-                            <article key={category.key} className="card p-3">
-                                <div className="flex items-center justify-between gap-2 mb-2">
-                                    <div className="text-xs text-zinc-500 uppercase tracking-wide">{t(category.labelKey)}</div>
+                            <article key={category.key} className="rounded-[1.5rem] bg-[var(--bg-card)] p-4 shadow-soft">
+                                <div className="flex items-center justify-between gap-2 mb-3">
+                                    <div className="text-[11px] text-[var(--muted-foreground)] uppercase tracking-[0.18em]">{t(category.labelKey)}</div>
                                     <div className="flex items-center gap-1.5">
                                         <button
-                                            className="btn-icon border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 disabled:opacity-40"
+                                            className="flex h-8 w-8 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--bg-card)] text-[var(--text-secondary)] disabled:opacity-40 hover:text-champagne transition-colors cursor-pointer"
                                             onClick={() => shiftCategory(category.key, 'prev')}
                                             disabled={items.length <= 1}
                                             type="button"
                                         >
                                             <ChevronLeft size={15} />
                                         </button>
-                                        <span className="text-xs text-zinc-500 min-w-[3rem] text-center">
+                                        <span className="text-xs text-[var(--muted-foreground)] min-w-[3rem] text-center">
                                             {items.length ? `${currentIndex + 1}/${items.length}` : '--'}
                                         </span>
                                         <button
-                                            className="btn-icon border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 disabled:opacity-40"
+                                            className="flex h-8 w-8 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--bg-card)] text-[var(--text-secondary)] disabled:opacity-40 hover:text-champagne transition-colors cursor-pointer"
                                             onClick={() => shiftCategory(category.key, 'next')}
                                             disabled={items.length <= 1}
                                             type="button"
@@ -240,7 +225,7 @@ export default function Outfit() {
                                 </div>
 
                                 <button
-                                    className="w-full rounded-xl bg-zinc-100 dark:bg-zinc-800 h-40 lg:h-44 p-2.5 flex items-center justify-center hover:opacity-90 transition-opacity"
+                                    className="w-full rounded-2xl bg-[var(--secondary)]/60 h-40 lg:h-44 p-3 flex items-center justify-center hover:opacity-90 transition-opacity cursor-pointer"
                                     onClick={() => item && navigate(`/clothes/${item.id}`)}
                                     type="button"
                                     disabled={!item}
@@ -252,7 +237,7 @@ export default function Outfit() {
                                             className="w-full h-full object-contain"
                                         />
                                     ) : (
-                                        <span className="text-xs text-zinc-400 text-center">{t('outfit.noItems', { label: t(category.labelKey) })}</span>
+                                        <span className="text-xs text-[var(--muted-foreground)] text-center">{t('outfit.noItems', { label: t(category.labelKey) })}</span>
                                     )}
                                 </button>
                             </article>
@@ -260,6 +245,21 @@ export default function Outfit() {
                     })}
                 </aside>
             </div>
+        </div>
+    )
+}
+
+function OutfitSlot({ item, emptyLabel, onClick }) {
+    return (
+        <div
+            className="rounded-2xl bg-[var(--secondary)] p-2 flex items-center justify-center cursor-pointer hover:bg-[var(--secondary)]/70 transition-colors"
+            onClick={onClick}
+        >
+            {item ? (
+                <img src={toImageUrl(item.image_url)} alt={item.item} className="w-full h-full object-contain" />
+            ) : (
+                <span className="text-xs text-[var(--muted-foreground)]">{emptyLabel}</span>
+            )}
         </div>
     )
 }

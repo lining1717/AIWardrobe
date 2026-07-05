@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
-import { Search } from 'lucide-react'
+import { Search, Settings } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
-export default function FilterBar({ onSearch, onFilterChange }) {
+export default function FilterBar({ onSearch, onFilterChange, onOpenSettings }) {
     const { t } = useTranslation()
     const [searchText, setSearchText] = useState('')
     const [selectedSeasons, setSelectedSeasons] = useState([])
@@ -52,27 +52,45 @@ export default function FilterBar({ onSearch, onFilterChange }) {
         onFilterChange({ seasons: selectedSeasons, styles: newStyles })
     }
 
+    const pillClass = (active) =>
+        `shrink-0 rounded-full px-4 py-1.5 text-sm transition-all duration-300 border ${
+            active
+                ? 'bg-champagne text-white border-transparent shadow-soft'
+                : 'bg-[var(--bg-card)]/60 text-[var(--muted-foreground)] border-[var(--border)] hover:border-[var(--accent)]/40 hover:text-[var(--text-primary)]'
+        }`
+
     return (
-        <div className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur top-0 py-3 space-y-4">
-            <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" size={18} />
-                <input
-                    type="text"
-                    placeholder={t('wardrobe.searchPlaceholder')}
-                    className="w-full pl-10 pr-4 py-2.5 bg-zinc-100/80 dark:bg-zinc-800/80 border-transparent rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent/20 focus:bg-white dark:focus:bg-zinc-800 transition-all text-zinc-800 dark:text-zinc-200 placeholder:text-zinc-400"
-                    value={searchText}
-                    onChange={(e) => setSearchText(e.target.value)}
-                />
+        <div className="glass border-b border-[var(--border)] py-4 space-y-4 top-0">
+            <div className="flex items-center justify-between gap-3">
+                <div className="relative flex-1">
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--muted-foreground)]" />
+                    <input
+                        type="text"
+                        placeholder={t('wardrobe.searchPlaceholder')}
+                        className="w-full rounded-full border border-[var(--border)] bg-[var(--bg-card)]/70 py-2.5 pl-11 pr-4 outline-none transition-colors focus:border-[var(--accent)]/50 text-sm text-[var(--text-primary)] placeholder:text-[var(--muted-foreground)]"
+                        value={searchText}
+                        onChange={(e) => setSearchText(e.target.value)}
+                    />
+                </div>
+                {onOpenSettings && (
+                    <button
+                        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--bg-card)] text-[var(--text-secondary)] shadow-soft transition-all duration-300 hover:-translate-y-0.5 hover:text-champagne cursor-pointer"
+                        onClick={onOpenSettings}
+                        title={t('settings.title')}
+                    >
+                        <Settings size={18} />
+                    </button>
+                )}
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-2.5">
                 <div className="flex items-center gap-3">
-                    <span className="text-xs font-semibold text-zinc-500 whitespace-nowrap uppercase tracking-wider">{t('filter.season')}</span>
+                    <span className="text-[11px] font-semibold text-[var(--muted-foreground)] whitespace-nowrap uppercase tracking-[0.18em]">{t('filter.season')}</span>
                     <div className="flex gap-2 overflow-x-auto hide-scrollbar pb-1">
                         {SEASONS.map(season => (
                             <button
                                 key={season.key}
-                                className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-all duration-200 ${selectedSeasons.includes(season.label) ? 'bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 shadow-sm' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-700'}`}
+                                className={pillClass(selectedSeasons.includes(season.label))}
                                 onClick={() => toggleSeason(season.label)}
                             >
                                 {season.label}
@@ -82,12 +100,12 @@ export default function FilterBar({ onSearch, onFilterChange }) {
                 </div>
 
                 <div className="flex items-center gap-3">
-                    <span className="text-xs font-semibold text-zinc-500 whitespace-nowrap uppercase tracking-wider">{t('filter.style')}</span>
+                    <span className="text-[11px] font-semibold text-[var(--muted-foreground)] whitespace-nowrap uppercase tracking-[0.18em]">{t('filter.style')}</span>
                     <div className="flex gap-2 overflow-x-auto hide-scrollbar pb-1">
                         {STYLES.map(style => (
                             <button
                                 key={style.key}
-                                className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-all duration-200 ${selectedStyles.includes(style.label) ? 'bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 shadow-sm' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-700'}`}
+                                className={pillClass(selectedStyles.includes(style.label))}
                                 onClick={() => toggleStyle(style.label)}
                             >
                                 {style.label}

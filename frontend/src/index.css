@@ -1,35 +1,73 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600&display=swap");
 @import "tailwindcss";
 
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-  --color-primary: #18181B;
-  --color-secondary: #3F3F46;
-  --color-accent: #2563EB;
-  --color-background: #FAFAFA;
+  /* Accent remapped to champagne gold (was blue #2563EB) */
+  --color-primary: #b99872;
+  --color-secondary: #efe9e1;
+  --color-accent: #b99872;
+  --color-background: #f7f4ef;
 
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-serif: "Playfair Display", ui-serif, Georgia, serif;
+  --font-sans: "Inter", "Noto Sans SC", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Playfair Display", "Noto Serif SC", ui-serif, Georgia, serif;
+
+  /* Remap zinc scale to warm tones so existing zinc-based utility classes
+     automatically adopt the soft warm palette without editing every component. */
+  --color-zinc-50: #f7f4ef;
+  --color-zinc-100: #efe9e1;
+  --color-zinc-200: rgba(38, 34, 30, 0.09);
+  --color-zinc-300: #d8cec1;
+  --color-zinc-400: #b3a99a;
+  --color-zinc-500: #9b9286;
+  --color-zinc-600: #7a7166;
+  --color-zinc-700: rgba(38, 34, 30, 0.18);
+  --color-zinc-800: #35302a;
+  --color-zinc-900: #26221e;
+  --color-zinc-950: #211e1a;
 }
 
 @layer base {
   :root {
-    --bg-primary: #FAFAFA;
-    --bg-card: #FFFFFF;
-    --text-primary: #09090B;
-    --text-secondary: #3F3F46;
-    --accent: #2563EB;
-    --border: #E4E4E7;
+    /* Warm cream palette (light) */
+    --bg-primary: #f7f4ef;
+    --bg-card: #ffffff;
+    --text-primary: #26221e;
+    --text-secondary: #4a443c;
+    --accent: #b99872;
+    --border: rgba(38, 34, 30, 0.09);
+
+    /* Extended warm accent tokens */
+    --muted: #efe9e1;
+    --muted-foreground: #9b9286;
+    --secondary: #efe9e1;
+    --secondary-foreground: #4a443c;
+    --accent-rose: #d9a7a2;
+    --accent-sage: #a7b3a0;
+    --accent-clay: #c98a7e;
+    --accent-champagne: #b99872;
+    --input-background: #f2ece4;
+    --radius: 1.25rem;
   }
 
   .dark {
-    --bg-primary: #09090B;
-    --bg-card: #18181B;
-    --text-primary: #FAFAFA;
-    --text-secondary: #A1A1AA;
-    --accent: #3B82F6;
-    --border: #27272A;
+    --bg-primary: #211e1a;
+    --bg-card: #2a2620;
+    --text-primary: #f2ece3;
+    --text-secondary: #cbb79a;
+    --accent: #cbb79a;
+    --border: rgba(242, 236, 227, 0.12);
+
+    --muted: #35302a;
+    --muted-foreground: #a89e90;
+    --secondary: #35302a;
+    --secondary-foreground: #f2ece3;
+    --accent-rose: #d9a7a2;
+    --accent-sage: #a7b3a0;
+    --accent-clay: #c98a7e;
+    --accent-champagne: #cbb79a;
+    --input-background: #35302a;
   }
 
   html,
@@ -46,28 +84,101 @@
 
 @layer utilities {
   .glass-header {
-    @apply bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md border-b border-zinc-200 dark:border-zinc-800 z-40 sticky top-0;
+    @apply backdrop-blur-md border-b border-[var(--border)] z-40 sticky top-0;
+    background: color-mix(in srgb, var(--bg-primary) 72%, transparent);
   }
+
+  .glass {
+    background: color-mix(in srgb, var(--bg-primary) 72%, transparent);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
+
   .card {
-    @apply bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300;
+    @apply bg-[var(--bg-card)] border border-[var(--border)] rounded-3xl transition-all duration-300;
+    box-shadow: 0 8px 30px rgba(38, 34, 30, 0.06);
   }
+  .card:hover {
+    box-shadow: 0 18px 50px rgba(38, 34, 30, 0.1);
+  }
+
+  .shadow-soft {
+    box-shadow: 0 8px 30px rgba(38, 34, 30, 0.06);
+  }
+  .shadow-soft-lg {
+    box-shadow: 0 18px 50px rgba(38, 34, 30, 0.1);
+  }
+
   .btn-primary {
-    @apply bg-[var(--accent)] text-white hover:opacity-90 transition-all duration-200 rounded-lg font-medium px-4 min-h-11 py-2 flex items-center justify-center gap-2;
+    @apply bg-[var(--accent)] text-white hover:opacity-90 transition-all duration-200 rounded-full font-medium px-5 min-h-11 py-2 flex items-center justify-center gap-2;
+    box-shadow: 0 8px 30px rgba(38, 34, 30, 0.06);
   }
   .btn-secondary {
-    @apply bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors duration-200 rounded-lg font-medium px-4 min-h-11 py-2 flex items-center justify-center gap-2;
+    @apply bg-[var(--secondary)] text-[var(--text-secondary)] hover:opacity-80 transition-all duration-200 rounded-full font-medium px-5 min-h-11 py-2 flex items-center justify-center gap-2;
   }
   .btn-icon {
-    @apply min-w-11 min-h-11 p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors;
+    @apply min-w-10 min-h-10 p-2 rounded-full bg-[var(--bg-card)] text-[var(--text-secondary)] hover:text-[var(--accent)] transition-all duration-300;
+    box-shadow: 0 8px 30px rgba(38, 34, 30, 0.06);
   }
+  .btn-icon:hover {
+    @apply -translate-y-0.5;
+  }
+
   .input-field {
-    @apply w-full px-4 py-2 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-all;
+    @apply w-full px-4 py-2.5 bg-[var(--input-background)] border border-transparent rounded-2xl text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/30 focus:border-[var(--accent)]/40 transition-all;
   }
+
+  .text-champagne {
+    color: var(--accent-champagne);
+  }
+  .bg-champagne {
+    background-color: var(--accent-champagne);
+  }
+  .text-clay {
+    color: var(--accent-clay);
+  }
+  .text-rose {
+    color: var(--accent-clay);
+  }
+  .text-sage {
+    color: #6f7d68;
+  }
+
+  /* Tag tones — soft tinted backgrounds */
+  .tag-champagne {
+    background: color-mix(in srgb, var(--accent-champagne) 16%, transparent);
+    color: var(--accent-champagne);
+  }
+  .tag-rose {
+    background: color-mix(in srgb, var(--accent-rose) 18%, transparent);
+    color: var(--accent-clay);
+  }
+  .tag-sage {
+    background: color-mix(in srgb, var(--accent-sage) 20%, transparent);
+    color: #6f7d68;
+  }
+  .tag-clay {
+    background: color-mix(in srgb, var(--accent-clay) 16%, transparent);
+    color: var(--accent-clay);
+  }
+  .tag-neutral {
+    background: var(--secondary);
+    color: var(--secondary-foreground);
+  }
+
   .hide-scrollbar::-webkit-scrollbar {
     display: none;
   }
   .hide-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.4s ease-out;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 }
