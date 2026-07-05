@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { Settings as SettingsIcon, RefreshCw, Sparkles, Droplets, Wind, Thermometer, ChevronLeft, ChevronRight, ArrowRight, MapPin, Plus } from 'lucide-react'
 import Settings from '../components/Settings'
 import { API_BASE, toImageUrl } from '../utils/api'
+import { weatherCodeToEmoji } from '../utils/weatherIcon'
 const FALLBACK_LOCATION = '上海, 上海市, 中国'
 
 const formatDate = (locale) => {
@@ -210,7 +211,7 @@ export default function Home() {
                         className="absolute -right-6 -top-8 select-none text-[9rem] leading-none opacity-15"
                         aria-hidden
                     >
-                        {weather?.icon || '🌤'}
+                        {weather ? weatherCodeToEmoji(weather.icon) : '🌤'}
                     </div>
                     <div className="relative flex items-center gap-1.5 text-[var(--muted-foreground)]">
                         <MapPin className="h-3.5 w-3.5" />

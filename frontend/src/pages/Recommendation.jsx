@@ -6,6 +6,7 @@ import ReactMarkdown from 'react-markdown'
 import { useRecommendation } from '../contexts/RecommendationContext'
 
 import { toImageUrl } from '../utils/api'
+import { weatherCodeToEmoji } from '../utils/weatherIcon'
 
 export default function Recommendation() {
     const { t, i18n } = useTranslation()
@@ -163,23 +164,6 @@ export default function Recommendation() {
             return
         }
         void fetchRecommendation(selectedCity.id, selectedCity.name, goalInput, selectedMode)
-    }
-
-    const getWeatherIcon = (icon) => {
-        const iconMap = {
-            '100': '☀️', '101': '☁️', '102': '⛅', '103': '⛅', '104': '☁️',
-            '150': '🌙', '300': '🌦️', '301': '⛈️', '302': '⛈️', '303': '⛈️',
-            '304': '🌨️', '305': '🌧️', '306': '🌧️', '307': '🌧️', '308': '🌧️',
-            '309': '🌦️', '310': '⛈️', '311': '⛈️', '312': '⛈️', '313': '🌨️',
-            '314': '🌧️', '315': '🌧️', '316': '🌧️', '317': '⛈️', '318': '⛈️',
-            '399': '🌧️', '400': '🌨️', '401': '🌨️', '402': '❄️', '403': '❄️',
-            '404': '🌨️', '405': '🌨️', '406': '🌨️', '407': '❄️', '408': '🌨️',
-            '409': '❄️', '410': '❄️', '499': '❄️', '500': '🌫️', '501': '🌫️',
-            '502': '🌫️', '503': '🌪️', '504': '🌪️', '507': '🌪️', '508': '🌪️',
-            '509': '🌫️', '510': '🌫️', '511': '🌫️', '512': '🌫️', '513': '🌫️',
-            '514': '🌫️', '515': '🌫️'
-        }
-        return iconMap[icon] || '🌤️'
     }
 
     const renderClothingCard = (item, label, reason) => {
@@ -356,7 +340,7 @@ export default function Recommendation() {
                         style={{ background: 'linear-gradient(135deg, #b99872, #d9a7a2)' }}
                     >
                         <div className="absolute -right-6 -top-10 select-none text-[10rem] leading-none opacity-20" aria-hidden>
-                            {getWeatherIcon(weather.icon)}
+                            {weatherCodeToEmoji(weather.icon)}
                         </div>
                         <div className="relative">
                             <div className="flex items-center gap-1.5 text-white/85">
