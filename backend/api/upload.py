@@ -1,6 +1,7 @@
 """
 图片上传 API
 """
+import time
 from fastapi import APIRouter, UploadFile, File, HTTPException
 from pathlib import Path
 import uuid
@@ -33,43 +34,53 @@ async def upload_image(file: UploadFile = File(...)):
     4. 保存到数据库
     5. 返回衣物信息
     """
+    t0 = time.time()
     # 验证文件类型
     if not file.content_type or not file.content_type.startswith("image/"):
         raise HTTPException(status_code=400, detail="只支持图片文件")
-    
+
     try:
         # 读取原始图片
         raw_bytes = await file.read()
-        
+        print(f"[upload] file={file.filename} content_type={file.content_type} size={len(raw_bytes)} bytes", flush=True)
+
         # 加载配置
         config = load_config()
-        
+
         # 根据配置选择背景移除方式
         if config.bg_removal_method == "removebg" and config.removebg_api_key:
             # 使用 remove.bg API
             try:
+                t1 = time.time()
                 processed_bytes = await remove_background_api(
                     raw_bytes, 
                     config.removebg_api_key
                 )
+                print(f"[upload] remove.bg done in {time.time()-t1:.1f}s, size={len(processed_bytes)} bytes", flush=True)
             except ValueError as e:
                 # 如果 remove.bg 失败，回退到本地处理
                 print(f"⚠️ remove.bg API 失败，回退到本地处理: {e}")
+                t1 = time.time()
                 processed_bytes = remove_background(raw_bytes)
+                print(f"[upload] local rembg fallback in {time.time()-t1:.1f}s, size={len(processed_bytes)} bytes", flush=True)
         else:
             # 使用本地 rembg
+            t1 = time.time()
             processed_bytes = remove_background(raw_bytes)
-        
+            print(f"[upload] local rembg done in {time.time()-t1:.1f}s, size={len(processed_bytes)} bytes", flush=True)
+
         # 使用 OpenAI 兼容 API 进行语义分析
+        t2 = time.time()
         semantics: ClothesSemantics = await analyze_clothes_openai(processed_bytes)
-        
+        print(f"[upload] LLM analyze done in {time.time()-t2:.1f}s", flush=True)
+
         # 生成文件名并保存
         filename = f"{uuid.uuid4()}.png"
         filepath = UPLOAD_DIR / filename
-        
+
         with open(filepath, "wb") as f:
             f.write(processed_bytes)
-        
+
         normalized_category = resolve_category_value(
             semantics.category,
             semantics.item,
@@ -89,17 +100,20 @@ async def upload_image(file: UploadFile = File(...)):
             description=semantics.description,
             image_filename=filename
         )
-        
+
         clothes_id = await add_clothes(clothes_data)
-        
+
         # 返回完整的衣物信息
         clothes = await get_clothes_by_id(clothes_id)
         if not clothes:
             raise HTTPException(status_code=500, detail="保存失败")
-        
+
+        print(f"[upload] total time {time.time()-t0:.1f}s clothes_id={clothes_id}", flush=True)
         return clothes
-        
+
     except ValueError as e:
+        print(f"[upload] ValueError after {time.time()-t0:.1f}s: {e}", flush=True)
         raise HTTPException(status_code=400, detail=f"图片分析失败: {str(e)}")
     except Exception as e:
+        print(f"[upload] Exception after {time.time()-t0:.1f}s: {e}", flush=True)
         raise HTTPException(status_code=500, detail=f"服务器错误: {str(e)}")

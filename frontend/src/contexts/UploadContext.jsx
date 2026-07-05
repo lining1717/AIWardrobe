@@ -1,5 +1,7 @@
 import { createContext, useCallback, useContext, useMemo, useRef, useState } from 'react'
 import { API_BASE } from '../utils/api'
+import { compressImage } from '../utils/imageCompress'
+import { fetchWithTimeout } from '../utils/fetchWithTimeout'
 
 const UploadContext = createContext(null)
 
@@ -32,11 +34,13 @@ export function UploadProvider({ children }) {
       throw new Error('INVALID_IMAGE_TYPE')
     }
 
+    // 客户端压缩：避免手机相机原图（3-8MB）跨网关超时（iOS Safari "Load failed"）
+    const compressedFile = await compressImage(file)
     const formData = new FormData()
-    formData.append('file', file)
+    formData.append('file', compressedFile)
 
     setStage('upload.removingBg', current, total)
-    const response = await fetch(`${API_BASE}/upload`, {
+    const response = await fetchWithTimeout(`${API_BASE}/upload`, {
       method: 'POST',
       body: formData
     })

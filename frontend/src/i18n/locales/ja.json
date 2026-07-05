@@ -52,6 +52,7 @@
     "analyzing": "衣類を分析中...",
     "done": "完了！",
     "uploadFailed": "アップロード失敗",
+    "networkError": "ネットワークが遅いかサービスが起動中です。もう一度お試しください",
     "batchResult": "一括インポート完了：成功 {{success}} 件、失敗 {{failed}} 件"
   },
   "wardrobe": {
@@ -84,7 +85,8 @@
     "tryOnGenerating": "生成中...",
     "tryOnResult": "試着結果",
     "tryOnNeedPersonImage": "先に本人写真をアップロードしてください。",
-    "tryOnFailed": "試着に失敗しました。Try-On 設定を確認してください。"
+    "tryOnFailed": "試着に失敗しました。Try-On 設定を確認してください。",
+    "tryOnNetworkError": "ネットワークが遅いかサービスが起動中です。もう一度お試しください"
   },
   "filter": {
     "season": "シーズン",

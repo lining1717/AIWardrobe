@@ -52,6 +52,7 @@
     "analyzing": "Analyzing clothing...",
     "done": "Done!",
     "uploadFailed": "Upload failed",
+    "networkError": "Network slow or service waking up, please retry",
     "batchResult": "Batch import completed: {{success}} succeeded, {{failed}} failed"
   },
   "wardrobe": {
@@ -84,7 +85,8 @@
     "tryOnGenerating": "Generating...",
     "tryOnResult": "Try-on result",
     "tryOnNeedPersonImage": "Please upload your photo first.",
-    "tryOnFailed": "Try-on failed. Please check Try-On settings."
+    "tryOnFailed": "Try-on failed. Please check Try-On settings.",
+    "tryOnNetworkError": "Network slow or service waking up, please retry"
   },
   "filter": {
     "season": "Season",

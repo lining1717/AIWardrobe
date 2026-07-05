@@ -4,6 +4,15 @@ import { useTranslation } from 'react-i18next'
 import { ArrowLeft, RefreshCw } from 'lucide-react'
 
 import { API_BASE, toImageUrl } from '../utils/api'
+import { compressImage } from '../utils/imageCompress'
+import { fetchWithTimeout } from '../utils/fetchWithTimeout'
+
+const NETWORK_ERROR_PATTERNS = ['NETWORK_TIMEOUT', 'Load failed', 'Failed to fetch']
+
+function isNetworkError(message) {
+    if (!message) return false
+    return NETWORK_ERROR_PATTERNS.includes(message)
+}
 
 export default function ClothesDetail() {
     const { t } = useTranslation()
@@ -78,12 +87,14 @@ export default function ClothesDetail() {
         setTryOnLoading(true)
         setTryOnError('')
         try {
+            // 客户端压缩人物照片，避免手机相机原图上传触发 iOS Safari "Load failed"
+            const compressedPersonImage = await compressImage(personImageFile)
             const formData = new FormData()
-            formData.append('person_image', personImageFile)
+            formData.append('person_image', compressedPersonImage)
             formData.append('garment_id', String(item.id))
             formData.append('category', item.category || 'top')
 
-            const response = await fetch(`${API_BASE}/tryon`, {
+            const response = await fetchWithTimeout(`${API_BASE}/tryon`, {
                 method: 'POST',
                 body: formData
             })
@@ -95,7 +106,8 @@ export default function ClothesDetail() {
 
             setTryOnResultUrl(toImageUrl(data.result_image_url))
         } catch (err) {
-            setTryOnError(err.message || t('clothesDetail.tryOnFailed'))
+            const message = err?.message || ''
+            setTryOnError(isNetworkError(message) ? t('clothesDetail.tryOnNetworkError') : (message || t('clothesDetail.tryOnFailed')))
         } finally {
             setTryOnLoading(false)
         }

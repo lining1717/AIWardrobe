@@ -2,6 +2,14 @@ import { useEffect, useRef, useState } from 'react'
 import { Upload as UploadIcon, Camera, Image as ImageIcon, X } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useUpload } from '../contexts/UploadContext'
+import { compressImage } from '../utils/imageCompress'
+
+const NETWORK_ERROR_PATTERNS = ['NETWORK_TIMEOUT', 'Load failed', 'Failed to fetch']
+
+function isNetworkError(message) {
+    if (!message) return false
+    return NETWORK_ERROR_PATTERNS.includes(message)
+}
 
 export default function Upload({ onUploadSuccess }) {
     const { t } = useTranslation()
@@ -46,7 +54,9 @@ export default function Upload({ onUploadSuccess }) {
         if (!lastError) return
         const translatedError = lastError === 'INVALID_IMAGE_TYPE'
             ? t('upload.selectImage')
-            : lastError
+            : isNetworkError(lastError)
+                ? t('upload.networkError')
+                : lastError
         alert(`${t('upload.uploadFailed')}: ${translatedError}`)
         consumeLastError()
     }, [lastError, t, consumeLastError])
@@ -115,12 +125,13 @@ export default function Upload({ onUploadSuccess }) {
         const ctx = canvas.getContext('2d')
         ctx.drawImage(videoRef.current, 0, 0)
 
-        canvas.toBlob((blob) => {
-            if (blob) {
-                const file = new File([blob], 'camera-photo.jpg', { type: 'image/jpeg' })
-                void uploadFiles([file])
-                stopCamera()
-            }
+        canvas.toBlob(async (blob) => {
+            if (!blob) return
+            const rawFile = new File([blob], 'camera-photo.jpg', { type: 'image/jpeg' })
+            // 复用 compressImage 统一压缩，避免桌面端 webcam 全尺寸上传
+            const file = await compressImage(rawFile)
+            void uploadFiles([file])
+            stopCamera()
         }, 'image/jpeg', 0.9)
     }
 

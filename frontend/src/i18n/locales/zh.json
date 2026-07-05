@@ -52,6 +52,7 @@
     "analyzing": "正在分析衣物...",
     "done": "完成!",
     "uploadFailed": "上传失败",
+    "networkError": "网络较慢或服务正在唤醒，请重试",
     "batchResult": "批量导入完成：成功 {{success}} 张，失败 {{failed}} 张"
   },
   "wardrobe": {
@@ -84,7 +85,8 @@
     "tryOnGenerating": "生成中...",
     "tryOnResult": "试穿结果",
     "tryOnNeedPersonImage": "请先上传本人照片。",
-    "tryOnFailed": "试穿失败，请检查 Try-On 配置。"
+    "tryOnFailed": "试穿失败，请检查 Try-On 配置。",
+    "tryOnNetworkError": "网络较慢或服务正在唤醒，请重试"
   },
   "filter": {
     "season": "季节",
